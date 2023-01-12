@@ -1,0 +1,20 @@
+{
+	"timeout_seconds": 300,
+	"conditions": [
+		{
+			"prom_address": "https://my-prometheus-instance",
+			"queries": [
+				{
+					"name": "vault",
+					"expression": "min_over_time(up{job=\"vault\"}[5m]) == 1",
+					"seconds_until_healthy": 120
+				},
+				{
+					"name": "vpn",
+					"expression": "min_over_time(up{job=\"vpn\",datacenter=\"de\"}[5m]) == 1",
+					"seconds_until_healthy": 120
+				}
+			]
+		}
+	]
+}
