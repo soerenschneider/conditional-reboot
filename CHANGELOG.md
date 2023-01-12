@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.1.0](https://github.com/soerenschneider/conditional-reboot/compare/v1.0.0...v1.1.0) (2023-01-12)
+
+
+### Features
+
+* add version cmd ([611de72](https://github.com/soerenschneider/conditional-reboot/commit/611de7258aecabb211ea0b30e7f2be3ea5a7237d))
+
+
+### Bug Fixes
+
+* fix syntax error ([a1836e1](https://github.com/soerenschneider/conditional-reboot/commit/a1836e18b216a0e6aeeb45a5f1587a3482ff385f))
+
 ## 1.0.0 (2023-01-12)
 
 
