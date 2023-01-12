@@ -33,7 +33,7 @@ type Conf struct {
 }
 
 func (c *Conf) BuildConditions() ([]*Condition, error) {
-	var conditions []*Condition
+	var conditions []*Condition = []*Condition{}
 	for _, crit := range c.Conditions {
 		client, err := api.NewClient(api.Config{
 			Address: crit.Address,
