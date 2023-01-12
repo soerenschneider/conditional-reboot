@@ -50,6 +50,7 @@ func NewConditionalReboot(conditions []*Condition, rebootImpl Reboot, timeoutSec
 		log.Warn().Msgf("Ignoring supplied timeout of %ds, using default of %v", timeoutSeconds, defaultWaitOnConditionsTimeout)
 		timeout = time.Second * defaultWaitOnConditionsTimeout
 	}
+	MetricStartTime.SetToCurrentTime()
 
 	return &ConditionalReboot{
 		timeout:    time.Now().Add(timeout),
@@ -100,7 +101,6 @@ func (m *ConditionalReboot) Run() {
 		go condition.Run(ctx)
 	}
 
-	MetricStartTime.SetToCurrentTime()
 	ticker := time.NewTicker(defaultEvaluationPeriod)
 
 	quit := make(chan os.Signal, 1)
@@ -208,4 +208,5 @@ func main() {
 		MetricRebootNeeded.Set(0)
 		log.Info().Msg("No restart needed, quitting")
 	}
+	MetricSuccess.Set(1)
 }
