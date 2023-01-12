@@ -1,5 +1,5 @@
 {
-	"timeout_seconds": 300,
+	"conditions_timeout_s": 300,
 	"conditions": [
 		{
 			"prom_address": "https://my-prometheus-instance",
