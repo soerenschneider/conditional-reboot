@@ -51,8 +51,8 @@ func (n *NeedrestartChecker) NeedsReboot() (bool, error) {
 		val, err := strconv.Atoi(ma[1])
 		if err != nil {
 			log.Error().Msgf("could not parse 'NEEDRESTART-KSTA': %v", err)
-		} else {
-			kernelUpdate = val > 1
+		} else if val > 1 {
+			kernelUpdate = true
 			log.Info().Msg("Kernel update detected")
 		}
 	}
