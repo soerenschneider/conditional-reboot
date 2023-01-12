@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"flag"
+	"fmt"
 	"github.com/hashicorp/go-retryablehttp"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -124,7 +125,15 @@ func parseFlags() {
 	flagConfigFile = flag.String("config", defaultConfigFileLocation, "config file to use")
 	flagDryRun = flag.Bool("dry-run", false, "do not perform any action")
 
+	version := flag.Bool("version", false, "Print version info and exit")
+	
 	flag.Parse()
+
+	if *version {
+		fmt.Println(BuildVersion)
+		os.Exit(0)
+	}
+
 }
 
 type MetricsHook struct {
@@ -155,6 +164,7 @@ func initLogging() {
 func main() {
 	parseFlags()
 	initLogging()
+	log.Info().Msgf("conditional-reboot version %s", BuildVersion)
 
 	conf, err := read(*flagConfigFile)
 	if err != nil {
