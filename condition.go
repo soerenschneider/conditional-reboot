@@ -5,7 +5,6 @@ import (
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/common/model"
 	"github.com/rs/zerolog/log"
-	"math/rand"
 	"sync"
 	"time"
 )
@@ -30,7 +29,7 @@ type Condition struct {
 }
 
 const (
-	defaultQueryInterval = time.Second * 30
+	defaultQueryInterval = time.Second * 15
 )
 
 func NewCondition(client v1.API, name, query string, durationUntilHealthy time.Duration) (*Condition, error) {
@@ -94,12 +93,6 @@ func (c *Condition) Run(ctx context.Context, wg *sync.WaitGroup) {
 			wg.Done()
 			return
 		case <-ticker.C:
-			// Try to slightly distribute reads
-			rand.Seed(time.Now().UTC().UnixNano())
-			sleepDuration := time.Millisecond * time.Duration(rand.Intn(2500))
-			log.Debug().Msgf("Sleeping for %v", sleepDuration)
-			time.Sleep(sleepDuration)
-
 			c.UpdateCondition(ctx)
 		}
 	}
@@ -117,15 +110,16 @@ func (c *Condition) setState(state State) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 	if c.currentState != nil {
-		log.Info().Msgf("State for '%s' changed from %s to %s", c.name, c.currentState.Name(), state.Name())
+		MetricStatus.WithLabelValues(c.name, c.currentState.Name()).Set(0)
+		log.Info().Msgf("State for '%s' changed from '%s' to '%s'", c.name, c.currentState.Name(), state.Name())
 	}
-	MetricStatus.WithLabelValues(c.name, state.Name()).Set(1)
 	c.currentState = state
+	MetricStatus.WithLabelValues(c.name, state.Name()).Set(1)
 }
 
 func (c *Condition) QuerySuccess() {
 	if c.queries > 0 && c.queries%5 == 0 {
-		log.Info().Msgf("Trying %d times", c.queries)
+		log.Info().Msgf("Performed %d times on %s condition", c.queries, c.name)
 	}
 	c.queries++
 	c.currentState.SuccessfulEvaluation()
