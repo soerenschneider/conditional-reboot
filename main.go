@@ -10,6 +10,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"os"
 	"os/signal"
+	"sync"
 	"time"
 )
 
@@ -96,9 +97,11 @@ func (m *ConditionalReboot) evaluate() {
 }
 
 func (m *ConditionalReboot) Run() {
+	wg := &sync.WaitGroup{}
+	wg.Add(len(m.conditions))
 	ctx, cancel := context.WithCancel(context.Background())
 	for _, condition := range m.conditions {
-		go condition.Run(ctx)
+		go condition.Run(ctx, wg)
 	}
 
 	ticker := time.NewTicker(defaultEvaluationPeriod)
@@ -114,7 +117,7 @@ func (m *ConditionalReboot) Run() {
 		case <-quit:
 			cancel()
 			log.Info().Msg("Caught signal from user, interrupting")
-			time.Sleep(1500 * time.Millisecond) // too lazy to use waitgroups
+			wg.Wait()
 			return
 		}
 	}

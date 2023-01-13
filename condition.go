@@ -76,7 +76,14 @@ func (c *Condition) UpdateCondition(ctx context.Context) {
 	}
 }
 
-func (c *Condition) Run(ctx context.Context) {
+func (c *Condition) Run(ctx context.Context, wg *sync.WaitGroup) {
+	if ctx == nil {
+		log.Fatal().Msg("empty context supplied")
+	}
+	if wg == nil {
+		log.Fatal().Msg("empty waitgroup supplied")
+	}
+
 	ticker := time.NewTicker(c.queryInterval)
 	c.UpdateCondition(ctx)
 
@@ -84,6 +91,7 @@ func (c *Condition) Run(ctx context.Context) {
 		select {
 		case <-ctx.Done():
 			log.Info().Msgf("%s received signal, packing it up", c.name)
+			wg.Done()
 			return
 		case <-ticker.C:
 			// Try to slightly distribute reads
