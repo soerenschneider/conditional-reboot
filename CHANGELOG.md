@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.2](https://github.com/soerenschneider/conditional-reboot/compare/v1.1.1...v1.1.2) (2023-01-13)
+
+
+### Miscellaneous Chores
+
+* release 1.1.2 ([d9e9fdc](https://github.com/soerenschneider/conditional-reboot/commit/d9e9fdc9c86b91c653fb8fb44a96f071f13f6940))
+
 ## [1.1.1](https://github.com/soerenschneider/conditional-reboot/compare/v1.1.0...v1.1.1) (2023-01-12)
 
 
