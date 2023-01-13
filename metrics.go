@@ -40,6 +40,12 @@ var (
 		Name:      "start_time_seconds",
 		Help:      "Whether the tool ran successful",
 	})
+
+	MetricConditions = promauto.NewGauge(prometheus.GaugeOpts{
+		Namespace: metricsNamespace,
+		Name:      "conditions_total",
+		Help:      "Amount of configured conditions",
+	})
 )
 
 func HandleMetrics(conf *Conf) error {
