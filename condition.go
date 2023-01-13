@@ -47,10 +47,10 @@ func NewCondition(client v1.API, name, query string, durationUntilHealthy time.D
 	}
 
 	cond.unhealthyState = &UnhealthyState{cond: cond}
-	cond.recoveringState = &RecoveringStatus{cond: cond}
-	cond.healthyState = &HealthyStatus{cond: cond}
+	cond.recoveringState = &RecoveringState{cond: cond}
+	cond.healthyState = &HealthyState{cond: cond}
 
-	cond.setState(cond.unhealthyState)
+	cond.setState(&InitialState{cond: cond})
 
 	return cond, nil
 }
