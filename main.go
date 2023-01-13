@@ -76,7 +76,7 @@ func (m *ConditionalReboot) evaluate() {
 	}
 	if healthyStateCnt == len(m.conditions) {
 		MetricSuccess.Set(1)
-		log.Info().Msgf("All %d conditions are healthy", len(m.conditions))
+		log.Info().Msgf("All %d conditions are healthy, rebooting", len(m.conditions))
 		err := m.rebootImpl.Reboot()
 		if err != nil {
 			MetricSuccess.Set(0)
@@ -188,6 +188,7 @@ func main() {
 	if err != nil {
 		log.Fatal().Err(err).Msg("Error parsing conditions")
 	}
+	MetricConditions.Set(float64(len(conditions)))
 
 	var rebootImpl Reboot = &DefaultRebootImpl{}
 	if *flagDryRun {
