@@ -6,6 +6,7 @@ import (
 	"github.com/prometheus/client_golang/api"
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -62,11 +63,13 @@ func (c *Conf) BuildConditions() ([]*Condition, error) {
 }
 
 func (c *Conf) GetRebootNeededChecker() (RebootNeededChecker, error) {
-	switch c.RebootCheckStrategy {
-	case NeedrestartName:
+	switch strings.ToLower(c.RebootCheckStrategy) {
+	case strings.ToLower(NeedrestartName):
 		return &NeedrestartChecker{}, nil
-	default:
+	case strings.ToLower(AlwaysRebootName):
 		return &AlwaysReboot{}, nil
+	default:
+		return nil, fmt.Errorf("unknown reboot checker: %s", c.RebootCheckStrategy)
 	}
 }
 
