@@ -38,7 +38,7 @@ var (
 	MetricStartTime = promauto.NewGauge(prometheus.GaugeOpts{
 		Namespace: metricsNamespace,
 		Name:      "start_time_seconds",
-		Help:      "Whether the tool ran successful",
+		Help:      "Timestamp in seconds when conditional-reboot was started",
 	})
 
 	MetricConditions = promauto.NewGauge(prometheus.GaugeOpts{
