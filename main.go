@@ -53,7 +53,7 @@ func NewConditionalReboot(conditions []*Condition, rebootImpl Reboot, conf *Conf
 
 	timeout := time.Second * time.Duration(conf.ConditionsTimeoutSeconds)
 	if conf.ConditionsTimeoutSeconds < 120 {
-		log.Warn().Msgf("Ignoring supplied timeout of %ds, using default of %v", conf.Conditions, defaultWaitOnConditionsTimeout)
+		log.Warn().Msgf("Ignoring supplied timeout of %ds, using default of %v", conf.ConditionsTimeoutSeconds, defaultWaitOnConditionsTimeout)
 		timeout = time.Second * defaultWaitOnConditionsTimeout
 	}
 	MetricStartTime.SetToCurrentTime()
