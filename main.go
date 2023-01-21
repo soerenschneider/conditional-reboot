@@ -33,11 +33,12 @@ type ConditionalReboot struct {
 	startTime  time.Time
 	conditions []*Condition
 	rebootImpl Reboot
+	conf       *Conf
 
 	evaluations int
 }
 
-func NewConditionalReboot(conditions []*Condition, rebootImpl Reboot, timeoutSeconds int) (*ConditionalReboot, error) {
+func NewConditionalReboot(conditions []*Condition, rebootImpl Reboot, conf *Conf) (*ConditionalReboot, error) {
 	if nil == conditions {
 		return nil, errors.New("empty conditions provided")
 	}
@@ -46,9 +47,13 @@ func NewConditionalReboot(conditions []*Condition, rebootImpl Reboot, timeoutSec
 		return nil, errors.New("empty rebootImpl implementation provided")
 	}
 
-	timeout := time.Second * time.Duration(timeoutSeconds)
-	if timeoutSeconds < 120 {
-		log.Warn().Msgf("Ignoring supplied timeout of %ds, using default of %v", timeoutSeconds, defaultWaitOnConditionsTimeout)
+	if nil == conf {
+		return nil, errors.New("empty conf supplied")
+	}
+
+	timeout := time.Second * time.Duration(conf.ConditionsTimeoutSeconds)
+	if conf.ConditionsTimeoutSeconds < 120 {
+		log.Warn().Msgf("Ignoring supplied timeout of %ds, using default of %v", conf.Conditions, defaultWaitOnConditionsTimeout)
 		timeout = time.Second * defaultWaitOnConditionsTimeout
 	}
 	MetricStartTime.SetToCurrentTime()
@@ -58,6 +63,7 @@ func NewConditionalReboot(conditions []*Condition, rebootImpl Reboot, timeoutSec
 		startTime:  time.Now(),
 		conditions: conditions,
 		rebootImpl: rebootImpl,
+		conf:       conf,
 	}, nil
 }
 
@@ -76,21 +82,26 @@ func (m *ConditionalReboot) evaluate() {
 	}
 	if healthyStateCnt == len(m.conditions) {
 		MetricSuccess.Set(1)
+		HandleMetrics(m.conf)
 		log.Info().Msgf("All %d conditions are healthy, rebooting", len(m.conditions))
 		err := m.rebootImpl.Reboot()
 		if err != nil {
 			MetricSuccess.Set(0)
+			HandleMetrics(m.conf)
 			log.Fatal().Err(err).Msg("Reboot system failed")
 			os.Exit(1)
 		}
+
 		// call os.Exit for reboot implementations that do not actually reboot the system
 		os.Exit(0)
 	}
 
-	if m.evaluations%5 == 0 {
+	if m.evaluations%12 == 0 {
+		HandleMetrics(m.conf)
 		log.Info().Msgf("%d/%d conditions are healthy after %s", healthyStateCnt, len(m.conditions), time.Now().Sub(m.startTime))
 	}
 	if time.Now().After(m.timeout) {
+		HandleMetrics(m.conf)
 		log.Fatal().Msgf("Did not reach healthy state within %s", time.Now().Sub(m.startTime))
 	}
 	m.evaluations++
@@ -129,7 +140,7 @@ func parseFlags() {
 	flagDryRun = flag.Bool("dry-run", false, "do not perform any action")
 
 	version := flag.Bool("version", false, "Print version info and exit")
-	
+
 	flag.Parse()
 
 	if *version {
@@ -195,7 +206,7 @@ func main() {
 		log.Info().Msg("Dry-run mode active, not going to reboot system")
 		rebootImpl = &NoReboot{}
 	}
-	m, err := NewConditionalReboot(conditions, rebootImpl, conf.ConditionsTimeoutSeconds)
+	m, err := NewConditionalReboot(conditions, rebootImpl, conf)
 	if err != nil {
 		log.Fatal().Err(err).Msg("Could not build command center")
 	}
