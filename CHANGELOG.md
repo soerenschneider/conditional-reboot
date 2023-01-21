@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.3](https://github.com/soerenschneider/conditional-reboot/compare/v1.1.2...v1.1.3) (2023-01-21)
+
+
+### Bug Fixes
+
+* write metrics before rebooting ([c8a30fd](https://github.com/soerenschneider/conditional-reboot/commit/c8a30fde868f236c239a332498f6c4df71654c56))
+
 ## [1.1.2](https://github.com/soerenschneider/conditional-reboot/compare/v1.1.1...v1.1.2) (2023-01-13)
 
 
