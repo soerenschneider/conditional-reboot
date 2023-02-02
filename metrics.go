@@ -2,7 +2,7 @@ package main
 
 import (
 	"bytes"
-	"errors"
+	"fmt"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/client_golang/prometheus/push"
@@ -54,16 +54,23 @@ var (
 	})
 )
 
-func HandleMetrics(conf *Conf) error {
+func HandleMetrics(conf *Conf) {
 	if conf == nil {
-		return errors.New("empty config supplied")
+		log.Error().Msg("empty config supplied")
+		return
 	}
 
 	if len(conf.PushgatewayUrl) > 0 {
-		PushMetrics(conf.PushgatewayUrl)
+		err := PushMetrics(conf.PushgatewayUrl)
+		if err != nil {
+			log.Error().Msgf("could not push metrics: %v", err)
+		}
 	}
 
-	return WriteMetrics(defaultMetricsFile)
+	err := WriteMetrics(defaultMetricsFile)
+	if err != nil {
+		log.Error().Msgf("could not write metrics: %v", err)
+	}
 }
 
 func PushMetrics(url string) error {
@@ -72,18 +79,17 @@ func PushMetrics(url string) error {
 }
 
 func WriteMetrics(path string) error {
-	log.Info().Msgf("Dumping metrics to %s", path)
+	log.Debug().Msgf("Dumping metrics to %s", path)
 	metrics, err := dumpMetrics()
 	if err != nil {
-		log.Info().Msgf("Error dumping metrics: %v", err)
-		return err
+		return fmt.Errorf("unable to dump metrics: %v", err)
 	}
 
 	err = os.WriteFile(path, []byte(metrics), 0644)
 	if err != nil {
-		log.Error().Msgf("Error writing metrics to '%s': %v", path, err)
+		return fmt.Errorf("can't write metrics to '%s': %v", path, err)
 	}
-	return err
+	return nil
 }
 
 func dumpMetrics() (string, error) {
