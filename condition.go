@@ -55,23 +55,27 @@ func NewCondition(client v1.API, name, query string, durationUntilHealthy time.D
 }
 
 func (c *Condition) UpdateCondition(ctx context.Context) {
+	log.Debug().Msgf("Querying prom api for condition '%s'", c.name)
 	result, warnings, err := c.client.Query(ctx, c.query, time.Now(), v1.WithTimeout(5*time.Second))
 	if err != nil {
+		QueryStatus.WithLabelValues(c.name).Set(0)
 		c.QueryError(err)
-		time.Sleep(c.queryInterval)
+		log.Error().Msgf("Querying prometheus failed: %v", err)
 		return
 	}
 
 	if len(warnings) > 0 {
-		log.Warn().Msgf("Warnings: %v\n", warnings)
+		log.Warn().Msgf("Warnings from prometheus: %v", warnings)
 	}
 
 	vec := result.(model.Vector)
 	log.Debug().Msgf("%v", vec)
 	if len(vec) > 0 {
 		c.QuerySuccess()
+		QueryStatus.WithLabelValues(c.name).Set(1)
 	} else {
 		c.QueryError(nil)
+		QueryStatus.WithLabelValues(c.name).Set(0)
 	}
 }
 

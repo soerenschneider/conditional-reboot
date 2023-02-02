@@ -23,6 +23,12 @@ var (
 		Help:      "Status of conditions",
 	}, []string{"name", "state"})
 
+	QueryStatus = promauto.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: metricsNamespace,
+		Name:      "query_status_success_bool",
+		Help:      "Status of a single query",
+	}, []string{"name"})
+
 	MetricSuccess = promauto.NewGauge(prometheus.GaugeOpts{
 		Namespace: metricsNamespace,
 		Name:      "success_bool",
