@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.1](https://github.com/soerenschneider/conditional-reboot/compare/v1.2.0...v1.2.1) (2023-02-02)
+
+
+### Bug Fixes
+
+* fix dependabot brainfart ([9e5502a](https://github.com/soerenschneider/conditional-reboot/commit/9e5502a080002bd0dbcff7e612b7089346eb600d))
+
 ## [1.2.0](https://github.com/soerenschneider/conditional-reboot/compare/v1.1.3...v1.2.0) (2023-02-02)
 
 
