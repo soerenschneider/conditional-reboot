@@ -1,0 +1,38 @@
+{
+  "groups": [
+    {
+      "name": "lost connectivity",
+      "state_evaluator_name": "and",
+      "state_evaluator_args": {
+        "reboot": "0s",
+        "error": "0s"
+      },
+      "agents": [
+        {
+          "checker_name": "prometheus",
+          "checker_args": {
+            "name": "example",
+            "address": "http://demo.r4bustperception.io:9090",
+            "queries": {
+              "up": "up == 1"
+            },
+            "mapResponseToHealthyStatus": false
+          },
+          "check_interval": "15s",
+          "healthy_streak_until_ok": 3,
+          "unhealthy_streak_until_reboot": 1
+        },
+        {
+          "checker_name": "tcp",
+          "checker_args": {
+            "host": "8.8.8.8",
+            "port": "54"
+          },
+          "check_interval": "15s",
+          "healthy_streak_until_ok": 1,
+          "unhealthy_streak_until_reboot": 1
+        }
+      ]
+    }
+  ]
+}

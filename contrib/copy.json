@@ -1,0 +1,73 @@
+{
+  "groups": [
+    {
+      "name": "needrestart",
+      "state_evaluator_name": "and",
+      "state_evaluator_args": {
+        "Unhealthy": "0m",
+        "Error": "0m"
+      },
+      "agents": [
+        {
+          "checker_name": "needrestart",
+          "check_interval_seconds": "30m",
+          "precondition_name": "time_window",
+          "precondition_args": {
+            "from": 3,
+            "to": 5
+          },
+          "streak_until_recovered": 1
+        },
+        {
+          "checker_name": "prometheus",
+          "checker_args": {
+            "name": "example",
+            "address": "http://demo.robustperception.io:9090",
+            "queries": {
+              "up": "up == 1"
+            },
+            "mapResponseToHealthyStatus": false
+          },
+          "check_interval_seconds": "15s",
+          "precondition_name": "time_window",
+          "precondition_args": {
+            "from": 3,
+            "to": 5
+          },
+          "streak_until_recovered": 3
+        }
+      ]
+    },
+
+    {
+      "name": "lost connectivity",
+      "state_evaluator_name": "and",
+      "state_evaluator_args": {
+        "Unhealthy": "5m",
+        "Error": "5m"
+      },
+      "agents": [
+        {
+          "checker_name": "tcp",
+          "checker_args": {
+            "host": "8.8.8.8",
+            "port": "53"
+          },
+          "check_interval_seconds": "60s",
+          "streak_until_recovered": 3,
+          "streak_until_unhealthy": 2
+        },
+        {
+          "checker_name": "tcp",
+          "checker_args": {
+            "host": "1.1.1.1",
+            "port": "53"
+          },
+          "check_interval_seconds": "60s",
+          "streak_until_recovered": 3,
+          "streak_until_unhealthy": 2
+        }
+      ]
+    }
+  ]
+}
