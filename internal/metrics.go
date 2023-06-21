@@ -54,20 +54,21 @@ func StartMetricsServer(addr string) error {
 
 func StartMetricsDumper(ctx context.Context, textFileDir string) {
 	ticker := time.NewTicker(5 * time.Minute)
-
 	file := path.Join(textFileDir, "conditional_reboot.prom")
-	if err := WriteMetrics(file); err != nil {
-		log.Error().Err(err).Msg("could not dump metrics")
+
+	writeMetrics := func() {
+		if err := WriteMetrics(file); err != nil {
+			log.Error().Err(err).Msg("could not dump metrics")
+		}
 	}
 
+	writeMetrics()
 	for {
 		select {
 		case <-ctx.Done():
 			ticker.Stop()
 		case <-ticker.C:
-			if err := WriteMetrics(file); err != nil {
-				log.Error().Err(err).Msg("could not dump metrics")
-			}
+			writeMetrics()
 		}
 	}
 }
