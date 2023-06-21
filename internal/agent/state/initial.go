@@ -1,5 +1,7 @@
 package state
 
+import "github.com/rs/zerolog/log"
+
 type InitialState struct {
 	stateful Agent
 }
@@ -35,5 +37,6 @@ func (s *InitialState) Success() {
 }
 
 func (s *InitialState) Error(err error) {
+	log.Error().Err(err).Msgf("'%s' encountered error", s.stateful.GetName())
 	s.stateful.SetState(&ErrorState{stateful: s.stateful})
 }

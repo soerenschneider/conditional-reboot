@@ -1,5 +1,7 @@
 package state
 
+import "github.com/rs/zerolog/log"
+
 type UncertainState struct {
 	stateful      Agent
 	successStreak int
@@ -35,5 +37,6 @@ func (s *UncertainState) Success() {
 }
 
 func (s *UncertainState) Error(err error) {
+	log.Error().Err(err).Msgf("'%s' encountered error", s.stateful.GetName())
 	s.stateful.SetState(&ErrorState{stateful: s.stateful})
 }

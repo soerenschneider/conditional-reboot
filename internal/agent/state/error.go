@@ -1,7 +1,10 @@
 package state
 
+import "github.com/rs/zerolog/log"
+
 type ErrorState struct {
-	stateful Agent
+	stateful    Agent
+	errorStreak int
 }
 
 func (s *ErrorState) Name() StateName {
@@ -18,4 +21,11 @@ func (s *ErrorState) Failure() {
 }
 
 func (s *ErrorState) Error(err error) {
+	// try not to flood the logs...
+	s.errorStreak++
+	if s.errorStreak > 3 {
+		log.Debug().Err(err).Msgf("'%s' encountered error", s.stateful.GetName())
+	} else {
+		log.Error().Err(err).Msgf("'%s' encountered error", s.stateful.GetName())
+	}
 }
