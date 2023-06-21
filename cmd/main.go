@@ -76,8 +76,9 @@ func verifyReboot() {
 	log.Warn().Msgf("You have %s to cancel this.", sleepTime)
 	time.Sleep(sleepTime)
 	if err := rebootImpl.Reboot(); err != nil {
-		log.Fatal().Err(err).Msg("reboot returned error")
+		log.Fatal().Err(err).Msg("Reboot returned error")
 	}
+	log.Fatal().Msg("Reboot apparently did not work as expected")
 }
 
 func runApp() {
