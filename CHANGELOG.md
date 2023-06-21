@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.2.0](https://github.com/soerenschneider/conditional-reboot/compare/v1.1.0...v1.2.0) (2023-06-21)
+
+
+### Features
+
+* allow dumping of metrics to be picked up by node_exporter ([c9e3b64](https://github.com/soerenschneider/conditional-reboot/commit/c9e3b64ff65d59acc68475baaea4a182507df073))
+
+
+### Bug Fixes
+
+* invoke metric on startup ([10d7067](https://github.com/soerenschneider/conditional-reboot/commit/10d7067bddfa2d1e000e4e8f04b9433f84669e8d))
+
 ## [1.1.0](https://github.com/soerenschneider/conditional-reboot/compare/v1.0.0...v1.1.0) (2023-06-21)
 
 
