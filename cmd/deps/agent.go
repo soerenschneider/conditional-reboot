@@ -39,6 +39,8 @@ func BuildChecker(c *internal.AgentConf) (checkers.Checker, error) {
 		return checkers.PrometheusCheckerFromMap(c.CheckerArgs)
 	case checkers.TcpName:
 		return checkers.TcpCheckerFromMap(c.CheckerArgs)
+	case checkers.IcmpCheckerName:
+		return checkers.IcmpCheckerFromMap(c.CheckerArgs)
 	}
 
 	return nil, fmt.Errorf("unknown checker: %s", c.CheckerName)
