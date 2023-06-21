@@ -83,6 +83,7 @@ func verifyReboot() {
 }
 
 func runApp() {
+	internal.ProcessStartTime.SetToCurrentTime()
 	initLogging()
 	log.Info().Msgf("conditional-reboot %s", internal.BuildVersion)
 
