@@ -121,7 +121,7 @@ func runApp() {
 			}
 		}()
 	} else if len(appConfig.MetricsDir) > 0 {
-		internal.StartMetricsDumper(context.Background(), appConfig.MetricsDir)
+		go internal.StartMetricsDumper(context.Background(), appConfig.MetricsDir)
 	} else {
 		log.Warn().Msg("Neither metrics server nor metrics dumping configured")
 	}
