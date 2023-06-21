@@ -74,7 +74,6 @@ func StartMetricsDumper(ctx context.Context, textFileDir string) {
 }
 
 func WriteMetrics(path string) error {
-	log.Info().Msgf("Dumping metrics to %s", path)
 	metrics, err := dumpMetrics()
 	if err != nil {
 		return err
