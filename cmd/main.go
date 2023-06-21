@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"flag"
@@ -118,6 +119,10 @@ func runApp() {
 				log.Fatal().Err(err).Msg("could not start metrics server")
 			}
 		}()
+	} else if len(appConfig.MetricsDir) > 0 {
+		internal.StartMetricsDumper(context.Background(), appConfig.MetricsDir)
+	} else {
+		log.Warn().Msg("Neither metrics server nor metrics dumping configured")
 	}
 
 	log.Info().Msg("Starting agents...")

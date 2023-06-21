@@ -9,7 +9,6 @@ import (
 const (
 	defaultStreakUntilOk      = 3
 	defaultStreakUntilReboot  = 1
-	defaultMetricsListenAddr  = ":9199"
 	defaultJournalFile        = "/var/log/conditional-reboot.log"
 	defaultStateEvaluatorName = "or"
 )
@@ -23,7 +22,8 @@ var (
 type ConditionalRebootConfig struct {
 	Groups            []*GroupConf `json:"groups" validate:"dive,required"`
 	JournalFile       string       `json:"journal_file" validate:"omitempty,filepath"`
-	MetricsListenAddr string       `json:"metrics_listen_addr"`
+	MetricsListenAddr string       `json:"metrics_listen_addr" validate:"excluded_with=MetricsDir"`
+	MetricsDir        string       `json:"metrics_dir" validate:"excluded_with=MetricsListenAddr,omitempty,dirpath"`
 }
 
 func (conf *ConditionalRebootConfig) UnmarshalJSON(data []byte) error {
@@ -31,8 +31,7 @@ func (conf *ConditionalRebootConfig) UnmarshalJSON(data []byte) error {
 
 	// Define conf temporary struct with default values
 	tmp := &Alias{
-		JournalFile:       defaultJournalFile,
-		MetricsListenAddr: defaultMetricsListenAddr,
+		JournalFile: defaultJournalFile,
 	}
 
 	// Unmarshal the JSON data into the temporary struct
