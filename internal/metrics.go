@@ -15,7 +15,10 @@ import (
 	"time"
 )
 
-const namespace = "conditional_reboot"
+const (
+	namespace                   = "conditional_reboot"
+	defaultMetricsDumpFrequency = 1 * time.Minute
+)
 
 var (
 	ProcessStartTime = promauto.NewGauge(prometheus.GaugeOpts{
@@ -53,7 +56,7 @@ func StartMetricsServer(addr string) error {
 }
 
 func StartMetricsDumper(ctx context.Context, textFileDir string) {
-	ticker := time.NewTicker(5 * time.Minute)
+	ticker := time.NewTicker(defaultMetricsDumpFrequency)
 	file := path.Join(textFileDir, "conditional_reboot.prom")
 
 	writeMetrics := func() {
