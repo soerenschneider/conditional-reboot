@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.1](https://github.com/soerenschneider/conditional-reboot/compare/v1.2.0...v1.2.1) (2023-06-21)
+
+
+### Bug Fixes
+
+* run metrics dumper in own goroutine ([651e612](https://github.com/soerenschneider/conditional-reboot/commit/651e612538031ef61def7168fd96c34d6ec0b0c1))
+
 ## [1.2.0](https://github.com/soerenschneider/conditional-reboot/compare/v1.1.0...v1.2.0) (2023-06-21)
 
 
