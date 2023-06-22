@@ -92,12 +92,12 @@ func (a *StatefulAgent) Run(ctx context.Context, stateUpdateChannel chan state.A
 }
 
 func (a *StatefulAgent) performCheck(ctx context.Context) {
-	internal.CheckerLastCheck.WithLabelValues(a.checker.Name()).SetToCurrentTime()
-
 	if !a.precondition.PerformCheck() {
 		log.Debug().Msgf("Precondition not met, not invoking checker %s", a.CheckerNiceName())
 		return
 	}
+
+	internal.CheckerLastCheck.WithLabelValues(a.checker.Name()).SetToCurrentTime()
 
 	isHealthy, err := a.checker.IsHealthy(ctx)
 	if err != nil {
