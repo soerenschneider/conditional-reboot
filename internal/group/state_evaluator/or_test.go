@@ -35,7 +35,7 @@ func (a *agent) Run(ctx context.Context, req chan state.Agent) error {
 	return nil
 }
 
-func (a *agent) GetName() string {
+func (a *agent) CheckerNiceName() string {
 	return ""
 }
 

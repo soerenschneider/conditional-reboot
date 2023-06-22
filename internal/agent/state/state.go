@@ -49,5 +49,5 @@ type Agent interface {
 	StreakUntilRebootState() int
 	GetStateDuration() time.Duration
 	Run(ctx context.Context, req chan Agent) error
-	GetName() string
+	CheckerNiceName() string
 }

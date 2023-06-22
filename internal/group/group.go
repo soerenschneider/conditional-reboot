@@ -55,7 +55,7 @@ func (g *Group) Start(ctx context.Context) {
 	for _, agent := range g.agents {
 		go func(a state.Agent) {
 			if err := a.Run(ctx, g.agentStateUpdateChan); err != nil {
-				log.Fatal().Err(err).Msgf("could start agent %s", a.GetName())
+				log.Fatal().Err(err).Msgf("could start agent %s", a.CheckerNiceName())
 			}
 		}(agent)
 	}
@@ -66,7 +66,7 @@ func (g *Group) Start(ctx context.Context) {
 		for {
 			select {
 			case agent := <-g.agentStateUpdateChan:
-				log.Info().Msgf("Received update from agent %s", agent.GetName())
+				log.Info().Msgf("Received update from agent %s", agent.CheckerNiceName())
 				if g.stateEvaluator.ShouldReboot(g) {
 					g.rebootRequests <- g
 				}

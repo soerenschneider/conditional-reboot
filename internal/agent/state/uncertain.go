@@ -37,6 +37,6 @@ func (s *UncertainState) Success() {
 }
 
 func (s *UncertainState) Error(err error) {
-	log.Error().Err(err).Msgf("'%s' encountered error", s.stateful.GetName())
+	log.Error().Err(err).Msgf("'%s' encountered error", s.stateful.CheckerNiceName())
 	s.stateful.SetState(&ErrorState{stateful: s.stateful})
 }

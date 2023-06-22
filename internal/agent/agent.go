@@ -114,9 +114,9 @@ func (a *StatefulAgent) performCheck(ctx context.Context) {
 func (a *StatefulAgent) SetState(newState state.State) {
 	log.Info().Msgf("Updating state for checker '%s' from '%s' -> '%s'", a.checker.Name(), a.state.Name(), newState.Name())
 
-	internal.AgentState.WithLabelValues(string(newState.Name()), a.GetName()).Set(1)
-	internal.AgentState.WithLabelValues(string(a.state.Name()), a.GetName()).Set(0)
-	internal.LastStateChange.WithLabelValues(string(a.state.Name()), a.GetName()).SetToCurrentTime()
+	internal.AgentState.WithLabelValues(string(newState.Name()), a.CheckerNiceName()).Set(1)
+	internal.AgentState.WithLabelValues(string(a.state.Name()), a.CheckerNiceName()).Set(0)
+	internal.LastStateChange.WithLabelValues(string(a.state.Name()), a.CheckerNiceName()).SetToCurrentTime()
 
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
@@ -127,10 +127,10 @@ func (a *StatefulAgent) SetState(newState state.State) {
 }
 
 func (a *StatefulAgent) String() string {
-	return fmt.Sprintf("%s checker=%s, checkInterval=%s, streakUntilOk=%d, streakUntilUnhealhty=%d", a.GetName(), a.checker.Name(), a.checkInterval, a.streakUntilOk, a.streakUntilRebootNeeded)
+	return fmt.Sprintf("%s checker=%s, checkInterval=%s, streakUntilOk=%d, streakUntilUnhealhty=%d", a.CheckerNiceName(), a.checker.Name(), a.checkInterval, a.streakUntilOk, a.streakUntilRebootNeeded)
 }
 
-func (a *StatefulAgent) GetName() string {
+func (a *StatefulAgent) CheckerNiceName() string {
 	return a.checker.Name()
 }
 

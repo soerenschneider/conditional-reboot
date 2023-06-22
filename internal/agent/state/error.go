@@ -24,8 +24,8 @@ func (s *ErrorState) Error(err error) {
 	// try not to flood the logs...
 	s.errorStreak++
 	if s.errorStreak > 3 {
-		log.Debug().Err(err).Msgf("'%s' encountered error", s.stateful.GetName())
+		log.Debug().Err(err).Msgf("'%s' encountered error", s.stateful.CheckerNiceName())
 	} else {
-		log.Error().Err(err).Msgf("'%s' encountered error", s.stateful.GetName())
+		log.Error().Err(err).Msgf("'%s' encountered error", s.stateful.CheckerNiceName())
 	}
 }
