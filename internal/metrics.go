@@ -30,19 +30,19 @@ var (
 		Namespace: namespace,
 		Subsystem: "checker",
 		Name:      "last_check_timestamp_seconds",
-	}, []string{"name"})
+	}, []string{"checker"})
 
 	AgentState = promauto.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: namespace,
 		Subsystem: "agent",
 		Name:      "state",
-	}, []string{"state", "name"})
+	}, []string{"state", "checker"})
 
 	LastStateChange = promauto.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: namespace,
 		Subsystem: "agent",
 		Name:      "state_change_timestamp_seconds",
-	}, []string{"state", "name"})
+	}, []string{"state", "checker"})
 
 	RebootErrors = promauto.NewGauge(prometheus.GaugeOpts{
 		Namespace: namespace,
