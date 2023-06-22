@@ -9,7 +9,6 @@ import (
 const (
 	defaultStreakUntilOk      = 3
 	defaultStreakUntilReboot  = 1
-	defaultJournalFile        = "/var/log/conditional-reboot.log"
 	defaultStateEvaluatorName = "or"
 )
 
@@ -24,24 +23,6 @@ type ConditionalRebootConfig struct {
 	JournalFile       string       `json:"journal_file" validate:"omitempty,filepath"`
 	MetricsListenAddr string       `json:"metrics_listen_addr" validate:"excluded_with=MetricsDir"`
 	MetricsDir        string       `json:"metrics_dir" validate:"excluded_with=MetricsListenAddr,omitempty,dirpath"`
-}
-
-func (conf *ConditionalRebootConfig) UnmarshalJSON(data []byte) error {
-	type Alias ConditionalRebootConfig // Create an alias to avoid recursion during unmarshalling
-
-	// Define conf temporary struct with default values
-	tmp := &Alias{
-		JournalFile: defaultJournalFile,
-	}
-
-	// Unmarshal the JSON data into the temporary struct
-	if err := json.Unmarshal(data, &tmp); err != nil {
-		return err
-	}
-
-	// Assign the values from the temporary struct to the original struct
-	*conf = ConditionalRebootConfig(*tmp)
-	return nil
 }
 
 func (conf *ConditionalRebootConfig) Print() {
