@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/soerenschneider/conditional-reboot/compare/v1.2.2...v1.3.0) (2023-06-22)
+
+
+### Features
+
+* add version metric ([e152a66](https://github.com/soerenschneider/conditional-reboot/commit/e152a6656c10706ac5a00f5cf891985562fc0e6c))
+
 ## [1.2.2](https://github.com/soerenschneider/conditional-reboot/compare/v1.2.1...v1.2.2) (2023-06-22)
 
 
