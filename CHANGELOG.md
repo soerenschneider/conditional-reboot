@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.2](https://github.com/soerenschneider/conditional-reboot/compare/v1.2.1...v1.2.2) (2023-06-22)
+
+
+### Bug Fixes
+
+* set metric when actually performing check ([4753755](https://github.com/soerenschneider/conditional-reboot/commit/47537558d0ce881982a0d58b3eae4a8d227a497b))
+
 ## [1.2.1](https://github.com/soerenschneider/conditional-reboot/compare/v1.2.0...v1.2.1) (2023-06-21)
 
 
