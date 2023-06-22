@@ -95,19 +95,20 @@ func (a *StatefulAgent) performCheck(ctx context.Context) {
 	internal.CheckerLastCheck.WithLabelValues(a.checker.Name()).SetToCurrentTime()
 
 	if !a.precondition.PerformCheck() {
-		log.Debug().Msg("Not performing check")
+		log.Debug().Msgf("Precondition not met, not invoking checker %s", a.CheckerNiceName())
 		return
 	}
 
 	isHealthy, err := a.checker.IsHealthy(ctx)
 	if err != nil {
 		a.state.Error(err)
+		return
+	}
+
+	if isHealthy {
+		a.state.Success()
 	} else {
-		if isHealthy {
-			a.state.Success()
-		} else {
-			a.state.Failure()
-		}
+		a.state.Failure()
 	}
 }
 
