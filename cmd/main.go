@@ -114,6 +114,8 @@ func runApp() {
 		log.Fatal().Err(err).Msg("could not build conditional-reboot app")
 	}
 
+	go internal.StartHeartbeat(context.Background())
+
 	if len(appConfig.MetricsListenAddr) > 0 {
 		go func() {
 			log.Info().Msgf("Starting metrics server at '%s'", appConfig.MetricsListenAddr)

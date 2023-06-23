@@ -16,14 +16,20 @@ import (
 )
 
 const (
-	namespace                   = "conditional_reboot"
-	defaultMetricsDumpFrequency = 1 * time.Minute
+	namespace                        = "conditional_reboot"
+	defaultMetricsDumpFrequency      = 1 * time.Minute
+	defaultMetricsHeartbeatFrequency = 1 * time.Minute
 )
 
 var (
 	ProcessStartTime = promauto.NewGauge(prometheus.GaugeOpts{
 		Namespace: namespace,
 		Name:      "start_timestamp_seconds",
+	})
+
+	Heartbeat = promauto.NewGauge(prometheus.GaugeOpts{
+		Namespace: namespace,
+		Name:      "heartbeat_timestamp_seconds",
 	})
 
 	Version = promauto.NewGaugeVec(prometheus.GaugeOpts{
@@ -58,6 +64,21 @@ var (
 func StartMetricsServer(addr string) error {
 	http.Handle("/metrics", promhttp.Handler())
 	return http.ListenAndServe(addr, nil)
+}
+
+func StartHeartbeat(ctx context.Context) {
+	ticker := time.NewTicker(defaultMetricsHeartbeatFrequency)
+	Heartbeat.SetToCurrentTime()
+
+	for {
+		select {
+		case <-ctx.Done():
+			ticker.Stop()
+			return
+		case <-ticker.C:
+			Heartbeat.SetToCurrentTime()
+		}
+	}
 }
 
 func StartMetricsDumper(ctx context.Context, textFileDir string) {
