@@ -24,13 +24,13 @@ var (
 )
 
 type PrometheusChecker struct {
-	name                       string
-	client                     v1.API
-	queries                    map[string]string
-	address                    string
-	clientCertFile             string
-	clientKeyFile string
-	wantResponse  bool
+	name           string
+	client         v1.API
+	queries        map[string]string
+	address        string
+	clientCertFile string
+	clientKeyFile  string
+	wantResponse   bool
 }
 
 func NewPrometheusChecker(name, address string, queries map[string]string) (*PrometheusChecker, error) {
