@@ -68,8 +68,20 @@ var (
 )
 
 func StartMetricsServer(addr string) error {
-	http.Handle("/metrics", promhttp.Handler())
-	return http.ListenAndServe(addr, nil)
+	mux := http.NewServeMux()
+	mux.Handle("/metrics", promhttp.Handler())
+	server := http.Server{
+		Addr:              addr,
+		ReadTimeout:       3 * time.Second,
+		ReadHeaderTimeout: 3 * time.Second,
+		WriteTimeout:      3 * time.Second,
+		IdleTimeout:       90 * time.Second,
+	}
+
+	if err := server.ListenAndServe(); errors.Is(err, http.ErrServerClosed) {
+		return err
+	}
+	return nil
 }
 
 func StartHeartbeat(ctx context.Context) {
