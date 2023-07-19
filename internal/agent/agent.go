@@ -26,7 +26,7 @@ type StatefulAgent struct {
 
 	state           state.State
 	lastStateChange time.Time
-	mutex           sync.Mutex
+	mutex           sync.RWMutex
 }
 
 func NewAgent(checker checkers.Checker, precondition preconditions.Precondition, conf *internal.AgentConf) (*StatefulAgent, error) {
@@ -144,8 +144,8 @@ func (a *StatefulAgent) StreakUntilRebootState() int {
 }
 
 func (a *StatefulAgent) GetState() state.State {
-	a.mutex.Lock()
-	defer a.mutex.Unlock()
+	a.mutex.RLock()
+	defer a.mutex.RUnlock()
 
 	return a.state
 }
