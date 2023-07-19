@@ -43,6 +43,12 @@ var (
 		Name:      "last_check_timestamp_seconds",
 	}, []string{"checker"})
 
+	CheckerState = promauto.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: namespace,
+		Subsystem: "checker",
+		Name:      "status",
+	}, []string{"checker", "status"})
+
 	AgentState = promauto.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: namespace,
 		Subsystem: "agent",
