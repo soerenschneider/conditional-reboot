@@ -6,7 +6,7 @@ SIGNATURE_KEYFILE = ~/.signify/github.sec
 DOCKER_PREFIX = ghcr.io/soerenschneider
 
 tests:
-	go test ./... -covermode=count -coverprofile=coverage.out
+	go test ./... -covermode=atomic -coverprofile=coverage.out -race
 	go tool cover -html=coverage.out -o=coverage.html
 	go tool cover -func=coverage.out -o=coverage.out
 
@@ -18,7 +18,7 @@ lint:
 	golangci-lint --timeout=180s run
 
 build: version-info
-	CGO_ENABLED=0 go build -ldflags="-X '$(MODULE)/internal.BuildVersion=${VERSION}' -X '$(MODULE)/internal.CommitHash=${COMMIT_HASH}'" -o $(BINARY_NAME) ./cmd
+	CGO_ENABLED=0 go build -ldflags="-X '$(MODULE)/internal.BuildVersion=${VERSION}' -X '$(MODULE)/internal.CommitHash=${COMMIT_HASH}'" -o $(BINARY_NAME) -race ./cmd
 
 release: clean version-info cross-build
 	cd $(BUILD_DIR) && sha256sum * > $(CHECKSUM_FILE) && cd -
