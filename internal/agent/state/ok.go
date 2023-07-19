@@ -14,7 +14,11 @@ func (s *NoRebootNeeded) Success() {
 }
 
 func (s *NoRebootNeeded) Failure() {
-	s.stateful.SetState(&RebootNeeded{stateful: s.stateful})
+	if s.stateful.StreakUntilRebootState() > 1 {
+		s.stateful.SetState(NewUncertainState(s.stateful))
+	} else {
+		s.stateful.SetState(&RebootNeeded{stateful: s.stateful})
+	}
 }
 
 func (s *NoRebootNeeded) Error(err error) {
