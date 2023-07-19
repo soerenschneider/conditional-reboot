@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.0](https://github.com/soerenschneider/conditional-reboot/compare/v1.3.0...v1.4.0) (2023-06-23)
+
+
+### Features
+
+* add heartbeat metric ([c2ac1fb](https://github.com/soerenschneider/conditional-reboot/commit/c2ac1fb5bc3dd4c836ca108bfdd159bc06b445a9))
+
 ## [1.3.0](https://github.com/soerenschneider/conditional-reboot/compare/v1.2.2...v1.3.0) (2023-06-22)
 
 
