@@ -126,7 +126,7 @@ func WriteMetrics(path string) error {
 		return err
 	}
 
-	return os.WriteFile(path, []byte(metrics), 0644)
+	return os.WriteFile(path, []byte(metrics), 0644) // #nosec G306
 }
 
 func dumpMetrics() (string, error) {

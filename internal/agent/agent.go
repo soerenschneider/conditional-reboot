@@ -102,13 +102,22 @@ func (a *StatefulAgent) performCheck(ctx context.Context) {
 	isHealthy, err := a.checker.IsHealthy(ctx)
 	if err != nil {
 		a.state.Error(err)
+		internal.CheckerState.WithLabelValues(a.checker.Name(), "err").Set(1)
+		internal.CheckerState.WithLabelValues(a.checker.Name(), "healthy").Set(0)
+		internal.CheckerState.WithLabelValues(a.checker.Name(), "unhealthy").Set(0)
 		return
 	}
 
 	if isHealthy {
 		a.state.Success()
+		internal.CheckerState.WithLabelValues(a.checker.Name(), "err").Set(0)
+		internal.CheckerState.WithLabelValues(a.checker.Name(), "healthy").Set(1)
+		internal.CheckerState.WithLabelValues(a.checker.Name(), "unhealthy").Set(0)
 	} else {
 		a.state.Failure()
+		internal.CheckerState.WithLabelValues(a.checker.Name(), "err").Set(0)
+		internal.CheckerState.WithLabelValues(a.checker.Name(), "healthy").Set(0)
+		internal.CheckerState.WithLabelValues(a.checker.Name(), "unhealthy").Set(1)
 	}
 }
 
