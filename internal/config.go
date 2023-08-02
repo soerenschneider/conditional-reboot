@@ -12,12 +12,6 @@ const (
 	defaultStateEvaluatorName = "or"
 )
 
-var (
-	defaultStateEvaluatorArgs = map[string]string{
-		string(state.RebootStateName): "0s",
-	}
-)
-
 type ConditionalRebootConfig struct {
 	Groups            []*GroupConf `json:"groups" validate:"dive,required"`
 	JournalFile       string       `json:"journal_file" validate:"omitempty,filepath"`
@@ -49,7 +43,9 @@ func (conf *GroupConf) UnmarshalJSON(data []byte) error {
 	// Define conf temporary struct with default values
 	tmp := &Alias{
 		StateEvaluatorName: defaultStateEvaluatorName,
-		StateEvaluatorArgs: defaultStateEvaluatorArgs,
+		StateEvaluatorArgs: map[string]string{
+			string(state.RebootStateName): "0s",
+		},
 	}
 
 	// Unmarshal the JSON data into the temporary struct
