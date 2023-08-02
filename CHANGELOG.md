@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.4.1](https://github.com/soerenschneider/conditional-reboot/compare/v1.4.0...v1.4.1) (2023-08-02)
+
+
+### Bug Fixes
+
+* fix all configs sharing the same reference ([2bda2c5](https://github.com/soerenschneider/conditional-reboot/commit/2bda2c5cbcb7267cb40dbef749ff5a8b176edd06))
+* respect streak ([1b97738](https://github.com/soerenschneider/conditional-reboot/commit/1b97738e9e24b53ec92a8172749bf6830222a08b))
+
 ## [1.4.0](https://github.com/soerenschneider/conditional-reboot/compare/v1.3.0...v1.4.0) (2023-06-23)
 
 
