@@ -3,16 +3,18 @@ package internal
 import (
 	"bytes"
 	"context"
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promauto"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/prometheus/common/expfmt"
-	"github.com/rs/zerolog/log"
+	"errors"
 	"net/http"
 	"os"
 	"path"
 	"strings"
 	"time"
+
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/prometheus/common/expfmt"
+	"github.com/rs/zerolog/log"
 )
 
 const (
