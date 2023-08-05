@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.2](https://github.com/soerenschneider/conditional-reboot/compare/v1.4.1...v1.4.2) (2023-08-05)
+
+
+### Bug Fixes
+
+* fix potential deadlock ([2e05765](https://github.com/soerenschneider/conditional-reboot/commit/2e057657b251158ad3c1b28a9f8713ef0e466bbf))
+
 ## [1.4.1](https://github.com/soerenschneider/conditional-reboot/compare/v1.4.0...v1.4.1) (2023-08-02)
 
 
