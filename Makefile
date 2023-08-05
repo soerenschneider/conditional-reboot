@@ -18,7 +18,7 @@ lint:
 	golangci-lint --timeout=180s run
 
 build: version-info
-	CGO_ENABLED=0 go build -ldflags="-X '$(MODULE)/internal.BuildVersion=${VERSION}' -X '$(MODULE)/internal.CommitHash=${COMMIT_HASH}'" -o $(BINARY_NAME) -race ./cmd
+	go build -ldflags="-X '$(MODULE)/internal.BuildVersion=${VERSION}' -X '$(MODULE)/internal.CommitHash=${COMMIT_HASH}'" -o $(BINARY_NAME) -race ./cmd
 
 release: clean version-info cross-build
 	cd $(BUILD_DIR) && sha256sum * > $(CHECKSUM_FILE) && cd -
