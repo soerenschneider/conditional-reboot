@@ -5,20 +5,21 @@ import (
 	"crypto/tls"
 	"errors"
 	"fmt"
+	"net/http"
+	"sync"
+	"time"
+
 	"github.com/hashicorp/go-retryablehttp"
 	"github.com/prometheus/client_golang/api"
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/common/model"
 	"github.com/rs/zerolog/log"
-	"net/http"
-	"sync"
-	"time"
 )
 
 const PrometheusName = "prometheus"
 
 var (
-	// try to regex-use clients that use the same address
+	// try to re-use clients that use the same address
 	clients = map[string]v1.API{}
 	mutex   sync.Mutex
 )
@@ -86,6 +87,7 @@ func (c *PrometheusChecker) buildClient() (v1.API, error) {
 	return v1.NewAPI(client), nil
 }
 
+//nolint:cyclop
 func PrometheusCheckerFromMap(args map[string]any) (*PrometheusChecker, error) {
 	if len(args) == 0 {
 		return nil, errors.New("could not build prometheus checker, empty args supplied")
