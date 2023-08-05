@@ -49,7 +49,7 @@ func (g *Group) Agents() []state.Agent {
 }
 
 func (g *Group) Start(ctx context.Context) {
-	agentUpdates := make(chan state.Agent)
+	agentUpdates := make(chan state.Agent, len(g.agents))
 
 	for _, agent := range g.agents {
 		go func(a state.Agent) {
