@@ -14,98 +14,6 @@ func (t *testClock) Now() time.Time {
 	return t.ret
 }
 
-func TestWindowedPrecondition_PerformCheck(t *testing.T) {
-	type fields struct {
-		FromHour int
-		ToHour   int
-		clock    Clock
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		want   bool
-	}{
-		{
-			name: "hour in between",
-			fields: fields{
-				FromHour: 0,
-				ToHour:   2,
-				clock: &testClock{
-					ret: time.Date(2023, time.Month(2), 21, 1, 10, 30, 0, time.UTC),
-				},
-			},
-			want: true,
-		},
-		{
-			name: "edge from",
-			fields: fields{
-				FromHour: 0,
-				ToHour:   2,
-				clock: &testClock{
-					ret: time.Date(2023, time.Month(2), 21, 0, 10, 30, 0, time.UTC),
-				},
-			},
-			want: true,
-		},
-		{
-			name: "edge to",
-			fields: fields{
-				FromHour: 0,
-				ToHour:   2,
-				clock: &testClock{
-					ret: time.Date(2023, time.Month(2), 21, 2, 10, 30, 0, time.UTC),
-				},
-			},
-			want: false,
-		},
-		{
-			name: "overlapping interval - within range",
-			fields: fields{
-				FromHour: 18,
-				ToHour:   2,
-				clock: &testClock{
-					ret: time.Date(2023, time.Month(2), 21, 0, 10, 30, 0, time.UTC),
-				},
-			},
-			want: true,
-		},
-		{
-			name: "overlapping interval - outside range",
-			fields: fields{
-				FromHour: 18,
-				ToHour:   2,
-				clock: &testClock{
-					ret: time.Date(2023, time.Month(2), 21, 4, 10, 30, 0, time.UTC),
-				},
-			},
-			want: false,
-		},
-		{
-			name: "outside interval",
-			fields: fields{
-				FromHour: 18,
-				ToHour:   2,
-				clock: &testClock{
-					ret: time.Date(2023, time.Month(2), 21, 14, 10, 30, 0, time.UTC),
-				},
-			},
-			want: false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			c := &WindowedPrecondition{
-				FromHour: tt.fields.FromHour,
-				ToHour:   tt.fields.ToHour,
-				clock:    tt.fields.clock,
-			}
-			if got := c.PerformCheck(); got != tt.want {
-				t.Errorf("PerformCheck() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
 func TestWindowPreconditionFromMap(t *testing.T) {
 	tests := []struct {
 		name    string
@@ -122,21 +30,21 @@ func TestWindowPreconditionFromMap(t *testing.T) {
 		{
 			name: "success",
 			args: map[string]any{
-				"from": 12.,
-				"to":   8.,
+				"from": "12:00",
+				"to":   "08:00",
 			},
 			want: &WindowedPrecondition{
-				FromHour: 12,
-				ToHour:   8,
-				clock:    &realClock{},
+				startTime: "12:00",
+				endTime:   "08:00",
+				clock:     &realClock{},
 			},
 			wantErr: false,
 		},
 		{
 			name: "wrong args",
 			args: map[string]any{
-				"from": 12.,
-				"to":   12.,
+				"asdf": "12:00",
+				"fdsa": "08:00",
 			},
 			want:    nil,
 			wantErr: true,
@@ -144,7 +52,7 @@ func TestWindowPreconditionFromMap(t *testing.T) {
 		{
 			name: "missing from",
 			args: map[string]any{
-				"to": 12.,
+				"to": "12:00",
 			},
 			want:    nil,
 			wantErr: true,
@@ -152,7 +60,7 @@ func TestWindowPreconditionFromMap(t *testing.T) {
 		{
 			name: "missing to",
 			args: map[string]any{
-				"from": 12.,
+				"from": "08:00",
 			},
 			want:    nil,
 			wantErr: true,
@@ -176,6 +84,184 @@ func TestWindowPreconditionFromMap(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("WindowPreconditionFromMap() got = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_extractHourAndMinute(t *testing.T) {
+	type args struct {
+		input string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *Delimiter
+		wantErr bool
+	}{
+		{
+			name: "valid",
+			args: args{
+				input: "01:11",
+			},
+			want: &Delimiter{
+				hour:   1,
+				minute: 11,
+			},
+			wantErr: false,
+		},
+		{
+			name: "valid",
+			args: args{
+				input: "00:00",
+			},
+			want: &Delimiter{
+				hour:   0,
+				minute: 0,
+			},
+			wantErr: false,
+		},
+		{
+			name: "invalid - not enough runes",
+			args: args{
+				input: "1:11",
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name: "invalid - too many runes",
+			args: args{
+				input: "120:11",
+			},
+			want:    nil,
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := extractHourAndMinute(tt.args.input)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("extractHourAndMinute() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("extractHourAndMinute() got = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestWindowedPrecondition_PerformCheck(t *testing.T) {
+	now := time.Now()
+	type fields struct {
+		startTime string
+		endTime   string
+		clock     Clock
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   bool
+	}{
+		{
+			name: "no overlap - too early",
+			fields: fields{
+				startTime: "14:00",
+				endTime:   "16:00",
+				clock: &testClock{
+					ret: time.Date(now.Year(), now.Month(), now.Day(), 13, 10, 30, 0, time.Local),
+				},
+			},
+			want: false,
+		},
+		{
+			name: "no overlap - too late",
+			fields: fields{
+				startTime: "14:00",
+				endTime:   "16:00",
+				clock: &testClock{
+					ret: time.Date(now.Year(), now.Month(), now.Day(), 17, 10, 30, 0, time.Local),
+				},
+			},
+			want: false,
+		},
+		{
+			name: "no overlap - within",
+			fields: fields{
+				startTime: "14:00",
+				endTime:   "16:00",
+				clock: &testClock{
+					ret: time.Date(now.Year(), now.Month(), now.Day(), 15, 10, 30, 0, time.Local),
+				},
+			},
+			want: true,
+		},
+		{
+			name: "overlapping time - too early",
+			fields: fields{
+				startTime: "14:00",
+				endTime:   "08:00",
+				clock: &testClock{
+					ret: time.Date(now.Year(), now.Month(), now.Day(), 12, 10, 30, 0, time.Local),
+				},
+			},
+			want: false,
+		},
+		{
+			name: "overlapping time - too late",
+			fields: fields{
+				startTime: "14:00",
+				endTime:   "08:00",
+				clock: &testClock{
+					ret: time.Date(now.Year(), now.Month(), now.Day(), 10, 10, 30, 0, time.Local),
+				},
+			},
+			want: false,
+		},
+		{
+			name: "overlapping time - within - tomorrow",
+			fields: fields{
+				startTime: "14:00",
+				endTime:   "08:00",
+				clock: &testClock{
+					ret: time.Date(now.Year(), now.Month(), now.Day(), 00, 10, 30, 0, time.Local),
+				},
+			},
+			want: true,
+		},
+		{
+			name: "overlapping time - within - today",
+			fields: fields{
+				startTime: "14:00",
+				endTime:   "08:00",
+				clock: &testClock{
+					ret: time.Date(now.Year(), now.Month(), now.Day(), 18, 10, 30, 0, time.Local),
+				},
+			},
+			want: true,
+		},
+		{
+			name: "overlapping time - within - today",
+			fields: fields{
+				startTime: "14:00",
+				endTime:   "00:00",
+				clock: &testClock{
+					ret: time.Date(now.Year(), now.Month(), now.Day(), 23, 10, 30, 0, time.Local),
+				},
+			},
+			want: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &WindowedPrecondition{
+				startTime: tt.fields.startTime,
+				endTime:   tt.fields.endTime,
+				clock:     tt.fields.clock,
+			}
+			if got := c.PerformCheck(); got != tt.want {
+				t.Errorf("PerformCheck() = %v, want %v", got, tt.want)
 			}
 		})
 	}
