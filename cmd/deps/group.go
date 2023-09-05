@@ -1,11 +1,12 @@
 package deps
 
 import (
+	"strings"
+
 	"github.com/soerenschneider/conditional-reboot/internal"
 	"github.com/soerenschneider/conditional-reboot/internal/agent/state"
 	"github.com/soerenschneider/conditional-reboot/internal/group"
 	"github.com/soerenschneider/conditional-reboot/internal/group/state_evaluator"
-	"strings"
 )
 
 func BuildGroup(groupUpdates chan *group.Group, conf *internal.GroupConf) (*group.Group, error) {
@@ -30,7 +31,7 @@ func BuildGroup(groupUpdates chan *group.Group, conf *internal.GroupConf) (*grou
 func BuildAgents(conf *internal.GroupConf) ([]state.Agent, error) {
 	var agents []state.Agent
 	for _, agentConf := range conf.Agents {
-		agent, err := BuildAgent(agentConf)
+		agent, err := BuildAgent(&agentConf)
 		if err != nil {
 			return nil, err
 		}

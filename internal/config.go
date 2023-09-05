@@ -2,6 +2,7 @@ package internal
 
 import (
 	"encoding/json"
+
 	"github.com/rs/zerolog/log"
 	"github.com/soerenschneider/conditional-reboot/internal/agent/state"
 )
@@ -13,10 +14,10 @@ const (
 )
 
 type ConditionalRebootConfig struct {
-	Groups            []*GroupConf `json:"groups" validate:"dive,required"`
-	JournalFile       string       `json:"journal_file" validate:"omitempty,filepath"`
-	MetricsListenAddr string       `json:"metrics_listen_addr" validate:"excluded_with=MetricsDir"`
-	MetricsDir        string       `json:"metrics_dir" validate:"excluded_with=MetricsListenAddr,omitempty,dirpath"`
+	Groups            []GroupConf `json:"groups" validate:"dive,required"`
+	JournalFile       string      `json:"journal_file" validate:"omitempty,filepath"`
+	MetricsListenAddr string      `json:"metrics_listen_addr" validate:"excluded_with=MetricsDir"`
+	MetricsDir        string      `json:"metrics_dir" validate:"excluded_with=MetricsListenAddr,omitempty,dirpath"`
 }
 
 func (conf *ConditionalRebootConfig) Print() {
@@ -30,8 +31,8 @@ func (conf *ConditionalRebootConfig) Print() {
 }
 
 type GroupConf struct {
-	Agents []*AgentConf `json:"agents" validate:"dive"`
-	Name   string       `json:"name" validate:"required"`
+	Agents []AgentConf `json:"agents" validate:"dive"`
+	Name   string      `json:"name" validate:"required"`
 
 	StateEvaluatorName string            `json:"state_evaluator_name"`
 	StateEvaluatorArgs map[string]string `json:"state_evaluator_args" validate:"required"`
