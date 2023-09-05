@@ -67,12 +67,16 @@ func (g *Group) Start(ctx context.Context) {
 			case agent := <-agentUpdates:
 				log.Info().Msgf("Received update from agent %s", agent.CheckerNiceName())
 				if g.stateEvaluator.ShouldReboot(g) {
+					log.Debug().Msgf("Reboot checker returned true")
 					g.rebootRequests <- g
 				}
+				log.Debug().Msgf("Reboot checker returned false")
 			case <-ticker.C:
 				if g.stateEvaluator.ShouldReboot(g) {
+					log.Debug().Msgf("Reboot checker ticker returned true")
 					g.rebootRequests <- g
 				}
+				log.Debug().Msgf("Reboot checker ticker returned false")
 			case <-ctx.Done():
 				ticker.Stop()
 				return

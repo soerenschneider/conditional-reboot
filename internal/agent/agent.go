@@ -92,6 +92,7 @@ func (a *StatefulAgent) Run(ctx context.Context, stateUpdateChannel chan state.A
 }
 
 func (a *StatefulAgent) performCheck(ctx context.Context) {
+	log.Debug().Msgf("performCheck() %s", a.CheckerNiceName())
 	if !a.precondition.PerformCheck() {
 		log.Debug().Msgf("Precondition not met, not invoking checker %s", a.CheckerNiceName())
 		return
@@ -99,8 +100,10 @@ func (a *StatefulAgent) performCheck(ctx context.Context) {
 
 	internal.CheckerLastCheck.WithLabelValues(a.checker.Name()).SetToCurrentTime()
 
+	log.Debug().Msgf("IsHealthy() %s", a.CheckerNiceName())
 	isHealthy, err := a.checker.IsHealthy(ctx)
 	if err != nil {
+		log.Debug().Msgf("IsHealthy(), err != nil %s", a.CheckerNiceName())
 		a.state.Error(err)
 		internal.CheckerState.WithLabelValues(a.checker.Name(), "err").Set(1)
 		internal.CheckerState.WithLabelValues(a.checker.Name(), "healthy").Set(0)
@@ -109,11 +112,13 @@ func (a *StatefulAgent) performCheck(ctx context.Context) {
 	}
 
 	if isHealthy {
+		log.Debug().Msgf("IsHealthy(), isHealthy=true %s", a.CheckerNiceName())
 		a.state.Success()
 		internal.CheckerState.WithLabelValues(a.checker.Name(), "err").Set(0)
 		internal.CheckerState.WithLabelValues(a.checker.Name(), "healthy").Set(1)
 		internal.CheckerState.WithLabelValues(a.checker.Name(), "unhealthy").Set(0)
 	} else {
+		log.Debug().Msgf("IsHealthy(), isHealthy=false %s", a.CheckerNiceName())
 		a.state.Failure()
 		internal.CheckerState.WithLabelValues(a.checker.Name(), "err").Set(0)
 		internal.CheckerState.WithLabelValues(a.checker.Name(), "healthy").Set(0)
@@ -128,12 +133,16 @@ func (a *StatefulAgent) SetState(newState state.State) {
 	internal.AgentState.WithLabelValues(string(a.state.Name()), a.CheckerNiceName()).Set(0)
 	internal.LastStateChange.WithLabelValues(string(a.state.Name()), a.CheckerNiceName()).SetToCurrentTime()
 
+	log.Debug().Msgf("SetState(%s) acquire lock (%s)", newState.Name(), a.CheckerNiceName())
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
+	log.Debug().Msgf("SetState(%s) success (%s)", newState.Name(), a.CheckerNiceName())
 
 	a.lastStateChange = time.Now()
 	a.state = newState
+	log.Debug().Msgf("Updating channel %s", a.checker.Name())
 	a.updateChannel <- a
+	log.Debug().Msgf("Updated channel %s", a.checker.Name())
 }
 
 func (a *StatefulAgent) String() string {
@@ -153,8 +162,10 @@ func (a *StatefulAgent) StreakUntilRebootState() int {
 }
 
 func (a *StatefulAgent) GetState() state.State {
+	log.Debug().Msgf("GetState() acquire lock (%s)", a.CheckerNiceName())
 	a.mutex.RLock()
 	defer a.mutex.RUnlock()
+	log.Debug().Msgf("GetState() lock success (%s)", a.CheckerNiceName())
 
 	return a.state
 }

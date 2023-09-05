@@ -22,6 +22,7 @@ func (s *UncertainState) Name() StateName {
 
 func (s *UncertainState) Failure() {
 	s.failureStreak += 1
+	log.Debug().Int("streak", s.failureStreak).Msgf("registered 'failure' for %s", s.stateful.CheckerNiceName())
 
 	if s.failureStreak >= s.stateful.StreakUntilRebootState() {
 		s.stateful.SetState(&RebootNeeded{stateful: s.stateful})
@@ -30,6 +31,7 @@ func (s *UncertainState) Failure() {
 
 func (s *UncertainState) Success() {
 	s.successStreak += 1
+	log.Debug().Int("streak", s.successStreak).Msgf("registered 'success' for %s", s.stateful.CheckerNiceName())
 
 	if s.successStreak >= s.stateful.StreakUntilOkState() {
 		s.stateful.SetState(&NoRebootNeeded{stateful: s.stateful})

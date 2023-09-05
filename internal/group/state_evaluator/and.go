@@ -1,8 +1,10 @@
 package state_evaluator
 
 import (
-	"github.com/soerenschneider/conditional-reboot/internal/agent/state"
 	"time"
+
+	"github.com/rs/zerolog/log"
+	"github.com/soerenschneider/conditional-reboot/internal/agent/state"
 )
 
 const StateCheckerAndName = "and"
@@ -32,7 +34,9 @@ func (r *StateCheckerAnd) ShouldReboot(group Group) bool {
 func (r *StateCheckerAnd) CheckAgent(agent state.Agent) bool {
 	currentState := agent.GetState().Name()
 	for wantedType, wantedFor := range r.wants {
+		log.Debug().Msgf("StateCheckerAnd: CheckAgent(%s), wanted=%s, wantedFor=%v", agent.CheckerNiceName(), wantedType, wantedFor)
 		if currentState == wantedType {
+			log.Debug().Msgf("StateCheckerAnd: CheckAgent(%s), currentState=%s, duration=%v", agent.CheckerNiceName(), currentState, agent.GetStateDuration())
 			if agent.GetStateDuration() >= wantedFor {
 				return true
 			}
