@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.0](https://github.com/soerenschneider/conditional-reboot/compare/v1.4.2...v1.5.0) (2023-09-05)
+
+
+### Features
+
+* use 'HH:MM' timestamps for precondition 'time window' ([286f2c5](https://github.com/soerenschneider/conditional-reboot/commit/286f2c5589acf4b9d0a8f28af59782abcc00fa24))
+
 ## [1.4.2](https://github.com/soerenschneider/conditional-reboot/compare/v1.4.1...v1.4.2) (2023-08-05)
 
 
