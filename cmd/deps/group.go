@@ -31,6 +31,7 @@ func BuildGroup(groupUpdates chan *group.Group, conf *internal.GroupConf) (*grou
 func BuildAgents(conf *internal.GroupConf) ([]state.Agent, error) {
 	var agents []state.Agent
 	for _, agentConf := range conf.Agents {
+		agentConf := agentConf
 		agent, err := BuildAgent(&agentConf)
 		if err != nil {
 			return nil, err

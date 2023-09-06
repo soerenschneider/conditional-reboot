@@ -11,6 +11,7 @@ func BuildGroups(groupUpdates chan *group.Group, conf *internal.ConditionalReboo
 	var groups []*group.Group
 
 	for _, groupConf := range conf.Groups {
+		groupConf := groupConf
 		group, err := BuildGroup(groupUpdates, &groupConf)
 		if err != nil {
 			return nil, fmt.Errorf("could not build group '%s': %w", groupConf.Name, err)
