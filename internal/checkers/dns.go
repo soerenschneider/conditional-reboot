@@ -4,8 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/rs/zerolog/log"
 	"net"
+
+	"github.com/rs/zerolog/log"
 )
 
 const DnsCheckerName = "dns"
@@ -42,10 +43,10 @@ func (c *DnsChecker) Name() string {
 func (c *DnsChecker) IsHealthy(_ context.Context) (bool, error) {
 	ips, err := net.LookupIP(c.host)
 	if err != nil {
-		log.Error().Err(err).Msgf("Connectivity checker '%s' reported error", err)
+		log.Error().Err(err).Str("checker", "dns").Msgf("Connectivity checker '%s' reported error", err)
 		return false, nil
 	}
 
-	log.Debug().Msgf("Received reply for checker '%s': %v", c.Name(), ips)
+	log.Debug().Str("checker", "dns").Msgf("Received reply for checker '%s': %v", c.Name(), ips)
 	return true, nil
 }
