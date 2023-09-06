@@ -29,6 +29,19 @@ NEEDRESTART-SESS: root @ session #28017`,
 			want1: true,
 		},
 		{
+			name: "more service updates",
+			output: `NEEDRESTART-VER: 3.6
+NEEDRESTART-KCUR: 5.14.0-284.25.1.el9_2.x86_64
+NEEDRESTART-KEXP: 5.14.0-284.25.1.el9_2.x86_64
+NEEDRESTART-KSTA: 2
+NEEDRESTART-UCSTA: 0
+NEEDRESTART-SVC: dbus-broker.service
+NEEDRESTART-SVC: systemd-logind.service
+NEEDRESTART-SVC: virtnetworkd.service`,
+			want:  false,
+			want1: true,
+		},
+		{
 			name: "wants kernel updates",
 			output: `NEEDRESTART-VER: 2.1
 NEEDRESTART-KCUR: 3.19.3-tl1+
@@ -89,6 +102,25 @@ func TestNeedrestartChecker_IsHealthy(t *testing.T) {
 		want    bool
 		wantErr bool
 	}{
+		{
+			name: "integration",
+			fields: fields{
+				rebootNeeded: false,
+				needrestart: &needrestartDummy{
+					out: `NEEDRESTART-VER: 3.6
+NEEDRESTART-KCUR: 5.14.0-284.25.1.el9_2.x86_64
+NEEDRESTART-KEXP: 5.14.0-284.25.1.el9_2.x86_64
+NEEDRESTART-KSTA: 2
+NEEDRESTART-UCSTA: 0
+NEEDRESTART-SVC: dbus-broker.service
+NEEDRESTART-SVC: systemd-logind.service
+NEEDRESTART-SVC: virtnetworkd.service`,
+					err: nil,
+				},
+			},
+			want:    false,
+			wantErr: false,
+		},
 		{
 			name: "empty output signals all is good",
 			fields: fields{
