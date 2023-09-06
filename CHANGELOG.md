@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.5.1](https://github.com/soerenschneider/conditional-reboot/compare/v1.5.0...v1.5.1) (2023-09-06)
+
+
+### Bug Fixes
+
+* fix memory aliasing bug ([8483897](https://github.com/soerenschneider/conditional-reboot/commit/8483897ed536a862e28398c77eb9e59566cbc30a))
+* make sure to always run needrestart as root ([fc55bce](https://github.com/soerenschneider/conditional-reboot/commit/fc55bce8455a62293b0d4aacada38bba16887983))
+
 ## [1.5.0](https://github.com/soerenschneider/conditional-reboot/compare/v1.4.2...v1.5.0) (2023-09-05)
 
 
