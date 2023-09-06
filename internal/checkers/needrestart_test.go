@@ -38,7 +38,7 @@ NEEDRESTART-UCSTA: 0
 NEEDRESTART-SVC: dbus-broker.service
 NEEDRESTART-SVC: systemd-logind.service
 NEEDRESTART-SVC: virtnetworkd.service`,
-			want:  false,
+			want:  true,
 			want1: true,
 		},
 		{
