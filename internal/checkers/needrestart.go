@@ -22,7 +22,7 @@ type Needrestart interface {
 type NeedrestartCmd struct{}
 
 func (n *NeedrestartCmd) Result(ctx context.Context) (string, error) {
-	out, err := exec.CommandContext(ctx, "needrestart", "-b").Output()
+	out, err := exec.CommandContext(ctx, "sudo", "needrestart", "-b").Output()
 	if err != nil {
 		return "", fmt.Errorf("could not determine if reboot is needed: %w", err)
 	}
