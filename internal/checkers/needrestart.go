@@ -3,17 +3,18 @@ package checkers
 import (
 	"context"
 	"fmt"
-	"github.com/rs/zerolog/log"
 	"os/exec"
 	"regexp"
 	"strconv"
 	"strings"
 	"sync"
+
+	"github.com/rs/zerolog/log"
 )
 
 const NeedrestartCheckerName = "needrestart"
 
-var regex = regexp.MustCompile(`NEEDRESTART-KSTA: (?P<ksta>\d)`)
+var kstaRegex = regexp.MustCompile(`NEEDRESTART-KSTA: (?P<ksta>\d)`)
 
 type Needrestart interface {
 	Result(ctx context.Context) (string, error)
@@ -75,23 +76,26 @@ func (n *NeedrestartChecker) IsHealthy(ctx context.Context) (bool, error) {
 }
 
 func (n *NeedrestartChecker) detectUpdates(out string) (bool, bool) {
-	// check for updated kernel
-	ma := regex.FindStringSubmatch(out)
 	var kernelUpdate, svcUpdates bool
-	if len(ma) > 0 {
-		val, err := strconv.Atoi(ma[1])
+
+	// check for updated kernel
+	matches := kstaRegex.FindStringSubmatch(out)
+	if len(matches) >= 2 {
+		val, err := strconv.Atoi(matches[1])
 		if err != nil {
-			log.Error().Msgf("could not parse 'NEEDRESTART-KSTA': %v", err)
+			log.Error().Str("checker", "needrestart").Msgf("could not parse 'NEEDRESTART-KSTA': %v", err)
 		} else if val > 1 {
 			kernelUpdate = true
-			log.Info().Msg("Kernel update detected")
+			log.Info().Str("checker", "needrestart").Int("KSTA", val).Msg("Kernel updates detected")
 		}
+	} else {
+		log.Warn().Str("checker", "needrestart").Msg("Could not find KSTA information")
 	}
 
 	// check for service upgrades
 	if strings.Contains(out, "NEEDRESTART-SVC:") {
 		svcUpdates = true
-		log.Info().Msg("Service updates detected")
+		log.Info().Str("checker", "needrestart").Msg("Service updates detected")
 	}
 
 	return kernelUpdate, svcUpdates
