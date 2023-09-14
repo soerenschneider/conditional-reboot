@@ -38,7 +38,7 @@ NEEDRESTART-UCSTA: 0
 NEEDRESTART-SVC: dbus-broker.service
 NEEDRESTART-SVC: systemd-logind.service
 NEEDRESTART-SVC: virtnetworkd.service`,
-			want:  true,
+			want:  false,
 			want1: true,
 		},
 		{
@@ -46,7 +46,7 @@ NEEDRESTART-SVC: virtnetworkd.service`,
 			output: `NEEDRESTART-VER: 2.1
 NEEDRESTART-KCUR: 3.19.3-tl1+
 NEEDRESTART-KEXP: 3.19.3-tl1+
-NEEDRESTART-KSTA: 2
+NEEDRESTART-KSTA: 3
 NEEDRESTART-CONT: LXC web1
 NEEDRESTART-SESS: metabase @ user manager service
 NEEDRESTART-SESS: root @ session #28017`,
@@ -68,7 +68,7 @@ NEEDRESTART-SESS: root @ session #28017`,
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			n := &NeedrestartChecker{}
+			n, _ := NewNeedrestartChecker()
 			got, got1 := n.detectUpdates(tt.output)
 			if got != tt.want {
 				t.Errorf("detectUpdates() got = %v, want %v", got, tt.want)
