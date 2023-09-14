@@ -1,6 +1,11 @@
 package uptime
 
-import "os"
+import (
+	"fmt"
+	"math"
+	"os"
+	"time"
+)
 
 var (
 	rawUptimeImpl UptimeSource = &LinuxUptime{}
@@ -14,7 +19,7 @@ type UptimeSource interface {
 func Uptime() (time.Duration, error) {
 	seconds, err := rawUptimeImpl.RawUptime()
 	if err != nil {
-		return time.Time{}, fmt.Errorf("could not read raw uptime: %w", err)
+		return time.Duration(0), fmt.Errorf("could not read raw uptime: %w", err)
 	}
 
 	return time.Second * time.Duration(seconds), nil
@@ -28,5 +33,5 @@ func (p *LinuxUptime) RawUptime() (float64, error) {
 	if err != nil {
 		return math.MaxFloat64, err
 	}
-	return parseLinuxUptime(uptime)
+	return parseLinuxUptime(string(uptime))
 }
