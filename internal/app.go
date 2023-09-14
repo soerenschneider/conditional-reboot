@@ -4,14 +4,18 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/rs/zerolog/log"
-	"github.com/soerenschneider/conditional-reboot/internal/group"
-	"github.com/soerenschneider/conditional-reboot/internal/journal"
-	"github.com/soerenschneider/conditional-reboot/pkg/reboot"
 	"os"
 	"os/signal"
 	"time"
+
+	"github.com/rs/zerolog/log"
+	"github.com/soerenschneider/conditional-reboot/internal/group"
+	"github.com/soerenschneider/conditional-reboot/internal/journal"
+	"github.com/soerenschneider/conditional-reboot/internal/uptime"
+	"github.com/soerenschneider/conditional-reboot/pkg/reboot"
 )
+
+const DefaultSystemUptimeHours = 4
 
 type ConditionalReboot struct {
 	groups        []*group.Group
@@ -45,6 +49,16 @@ func NewConditionalReboot(groups []*group.Group, rebootImpl reboot.Reboot, audit
 	}, nil
 }
 
+func IsSafeToReboot() bool {
+	systemUptime, err := uptime.Uptime()
+	if err != nil {
+		log.Error().Err(err).Msgf("could not determine system uptime, rebooting anyway: %w", err)
+		return true
+	}
+
+	return systemUptime.Hours() >= DefaultSystemUptimeHours
+}
+
 func (app *ConditionalReboot) Start() {
 	ctx, cancel := context.WithCancel(context.Background())
 	for _, group := range app.groups {
@@ -62,7 +76,11 @@ func (app *ConditionalReboot) Start() {
 			return
 
 		case group := <-app.rebootRequest:
-			log.Info().Msgf("Group '%s' requests reboot", group.GetName())
+			log.Info().Msgf("Reboot request from group '%s'", group.GetName())
+
+			if !IsSafeToReboot() {
+				log.Warn().Msg("Not safe to reboot (yet), ignoring reboot request")
+			}
 
 			if err := app.audit.Journal(actionToText(group)); err != nil {
 				log.Err(err).Msg("could not write journal")
