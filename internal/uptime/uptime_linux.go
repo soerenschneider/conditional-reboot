@@ -9,7 +9,6 @@ import (
 
 var (
 	rawUptimeImpl UptimeSource = &LinuxUptime{}
-	clock         Clock        = &realClock{}
 )
 
 type UptimeSource interface {
@@ -34,4 +33,10 @@ func (p *LinuxUptime) RawUptime() (float64, error) {
 		return math.MaxFloat64, err
 	}
 	return parseLinuxUptime(string(uptime))
+}
+
+func parseLinuxUptime(uptime string) (float64, error) {
+	parts := strings.Split(string(uptime), " ")
+	secondsStr := strings.TrimSpace(parts[0])
+	return strconv.ParseFloat(secondsStr, 64)
 }
