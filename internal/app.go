@@ -52,7 +52,7 @@ func NewConditionalReboot(groups []*group.Group, rebootImpl reboot.Reboot, audit
 func IsSafeToReboot() bool {
 	systemUptime, err := uptime.Uptime()
 	if err != nil {
-		log.Error().Err(err).Msgf("could not determine system uptime, rebooting anyway: %w", err)
+		log.Error().Err(err).Msgf("could not determine system uptime, rebooting anyway: %v", err)
 		return true
 	}
 
