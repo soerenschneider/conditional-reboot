@@ -2,6 +2,7 @@ package deps
 
 import (
 	"fmt"
+
 	"github.com/soerenschneider/conditional-reboot/internal"
 	"github.com/soerenschneider/conditional-reboot/internal/agent"
 	"github.com/soerenschneider/conditional-reboot/internal/agent/preconditions"
@@ -30,7 +31,7 @@ func BuildAgent(c *internal.AgentConf) (*agent.StatefulAgent, error) {
 func BuildChecker(c *internal.AgentConf) (checkers.Checker, error) {
 	switch c.CheckerName {
 	case checkers.NeedrestartCheckerName:
-		return checkers.NewNeedrestartChecker(), nil
+		return checkers.NeedrestartCheckerFromMap(c.CheckerArgs)
 	case checkers.FileCheckerName:
 		return checkers.FileCheckerFromMap(c.CheckerArgs)
 	case checkers.DnsCheckerName:

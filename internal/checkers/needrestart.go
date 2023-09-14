@@ -12,7 +12,11 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-const NeedrestartCheckerName = "needrestart"
+const (
+	NeedrestartCheckerName = "needrestart"
+	DefaultKstaVal         = 2 // A bug in needrestart _always_ yields '2' on Rocky Linux, even directly after a restart
+	DefaultRebootOnSvc     = true
+)
 
 var kstaRegex = regexp.MustCompile(`NEEDRESTART-KSTA: (?P<ksta>\d)`)
 
@@ -33,16 +37,30 @@ func (n *NeedrestartCmd) Result(ctx context.Context) (string, error) {
 
 // NeedrestartChecker uses https://github.com/liske/needrestart to check whether rebooting is needed
 type NeedrestartChecker struct {
+	rebootOnSvc   bool
+	rebootMinKsta int
+
 	rebootNeeded bool
 	sync         sync.Mutex
 	needrestart  Needrestart
 }
 
-func NewNeedrestartChecker() *NeedrestartChecker {
-	return &NeedrestartChecker{
-		sync:        sync.Mutex{},
-		needrestart: &NeedrestartCmd{},
+func NewNeedrestartChecker(options ...func(checker *NeedrestartChecker) error) (*NeedrestartChecker, error) {
+	checker := &NeedrestartChecker{
+		sync:          sync.Mutex{},
+		needrestart:   &NeedrestartCmd{},
+		rebootMinKsta: DefaultKstaVal,
+		rebootOnSvc:   DefaultRebootOnSvc,
 	}
+
+	for _, opt := range options {
+		err := opt(checker)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return checker, nil
 }
 
 func (n *NeedrestartChecker) Name() string {
@@ -65,8 +83,12 @@ func (n *NeedrestartChecker) IsHealthy(ctx context.Context) (bool, error) {
 
 	kernelUpdate, svcUpdates := n.detectUpdates(out)
 
-	// cache response - we won't recover from a needed reboot until we actually reboot
-	n.rebootNeeded = kernelUpdate || svcUpdates
+	// cache a response in case we need to reboot - we won't recover from a needed reboot until we actually reboot
+	if n.rebootOnSvc {
+		n.rebootNeeded = kernelUpdate || svcUpdates
+	} else {
+		n.rebootNeeded = kernelUpdate
+	}
 
 	// reboot is needed, report unhealthy status
 	if n.rebootNeeded {
@@ -84,7 +106,7 @@ func (n *NeedrestartChecker) detectUpdates(out string) (bool, bool) {
 		val, err := strconv.Atoi(matches[1])
 		if err != nil {
 			log.Error().Str("checker", "needrestart").Msgf("could not parse 'NEEDRESTART-KSTA': %v", err)
-		} else if val > 1 {
+		} else if val > n.rebootMinKsta {
 			kernelUpdate = true
 			log.Info().Str("checker", "needrestart").Int("KSTA", val).Msg("Kernel updates detected")
 		}
