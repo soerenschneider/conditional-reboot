@@ -26,7 +26,7 @@ func SetRebootOnSvc(rebootOnSvc bool) func(checker *NeedrestartChecker) error {
 
 func NeedrestartCheckerFromMap(args map[string]any) (*NeedrestartChecker, error) {
 	if args == nil {
-		return nil, errors.New("empty args supplied")
+		return NewNeedrestartChecker()
 	}
 
 	var opts []func(checker *NeedrestartChecker) error
