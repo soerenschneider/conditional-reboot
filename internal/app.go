@@ -78,22 +78,22 @@ func (app *ConditionalReboot) Start() {
 		case group := <-app.rebootRequest:
 			log.Info().Msgf("Reboot request from group '%s'", group.GetName())
 
-			if !IsSafeToReboot() {
-				log.Warn().Msg("Not safe to reboot (yet), ignoring reboot request")
-			}
+			if IsSafeToReboot() {
+				log.Info().Msg("Trying to reboot...")
+				if err := app.audit.Journal(actionToText(group)); err != nil {
+					log.Err(err).Msg("could not write journal")
+				}
 
-			if err := app.audit.Journal(actionToText(group)); err != nil {
-				log.Err(err).Msg("could not write journal")
-			}
-
-			log.Info().Msg("Trying to reboot...")
-			if err := app.rebootImpl.Reboot(); err != nil {
-				RebootErrors.Set(1)
-				log.Error().Err(err).Msg("reboot failed")
+				if err := app.rebootImpl.Reboot(); err != nil {
+					RebootErrors.Set(1)
+					log.Error().Err(err).Msg("Reboot failed")
+				} else {
+					log.Info().Msgf("Cancelling")
+					cancel()
+					time.Sleep(5 * time.Second)
+				}
 			} else {
-				log.Info().Msgf("Cancelling")
-				cancel()
-				time.Sleep(5 * time.Second)
+				log.Warn().Msg("Not safe to reboot (yet), ignoring reboot request")
 			}
 		}
 	}
