@@ -10,7 +10,7 @@ import (
 	"github.com/soerenschneider/conditional-reboot/internal/group/state_evaluator"
 )
 
-const tickerInterval = 15 * time.Second
+const tickerInterval = 1 * time.Minute
 
 type Group struct {
 	agents         []state.Agent
