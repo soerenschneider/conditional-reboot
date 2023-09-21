@@ -1,10 +1,6 @@
 package checkers
 
-import (
-	"errors"
-	"fmt"
-	"strconv"
-)
+import "errors"
 
 func SetMinKsta(ksta int) func(checker *NeedrestartChecker) error {
 	return func(checker *NeedrestartChecker) error {
@@ -30,23 +26,14 @@ func NeedrestartCheckerFromMap(args map[string]any) (*NeedrestartChecker, error)
 	}
 
 	var opts []func(checker *NeedrestartChecker) error
-	rebootOnSvcStr, ok := args["reboot_on_svc"].(string)
+	rebootOnSvc, ok := args["reboot_on_svc"].(bool)
 	if ok {
-		value, err := strconv.ParseBool(rebootOnSvcStr)
-		if err != nil {
-			return nil, fmt.Errorf("could not parse 'reboot_on_svc' field: %w", err)
-		}
-
-		opts = append(opts, SetRebootOnSvc(value))
+		opts = append(opts, SetRebootOnSvc(rebootOnSvc))
 	}
 
-	minKstaVal, ok := args["min_ksta"].(string)
+	minKstaVal, ok := args["min_ksta"].(float64)
 	if ok {
-		value, err := strconv.Atoi(minKstaVal)
-		if err != nil {
-			return nil, fmt.Errorf("could not parse 'min_ksta' field: %w", err)
-		}
-
+		value := int(minKstaVal)
 		opts = append(opts, SetMinKsta(value))
 	}
 
