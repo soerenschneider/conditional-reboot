@@ -2,19 +2,21 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
+	"net/http"
+	"os"
+	"time"
+
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/soerenschneider/conditional-reboot/cmd/deps"
 	"github.com/soerenschneider/conditional-reboot/internal"
+	"github.com/soerenschneider/conditional-reboot/internal/app"
+	"github.com/soerenschneider/conditional-reboot/internal/config"
 	"github.com/soerenschneider/conditional-reboot/internal/group"
 	"github.com/soerenschneider/conditional-reboot/pkg/reboot"
-	"net/http"
-	"os"
-	"time"
 )
 
 const defaultConfigFile = "/etc/conditional-reboot.json"
@@ -72,10 +74,10 @@ func printVersion() {
 }
 
 func verifyReboot() {
-	sleepTime := 15 * time.Second
+	considerationTime := 15 * time.Second
 	log.Warn().Msg("Verifying whether reboot works. This will (most-likely) reboot your machine.")
-	log.Warn().Msgf("You have %s to cancel this.", sleepTime)
-	time.Sleep(sleepTime)
+	log.Warn().Msgf("You have %s to abort by pressing CTRL+C.", considerationTime)
+	time.Sleep(considerationTime)
 	if err := rebootImpl.Reboot(); err != nil {
 		log.Fatal().Err(err).Msg("Reboot returned error")
 	}
@@ -89,12 +91,12 @@ func runApp() {
 	initLogging()
 	log.Info().Msgf("conditional-reboot %s", internal.BuildVersion)
 
-	appConfig, err := readConfig(configFile)
+	appConfig, err := config.ReadConfig(configFile)
 	if err != nil {
 		log.Fatal().Err(err).Msgf("could not read config file '%s'", configFile)
 	}
 	appConfig.Print()
-	if err := internal.ValidateConfig(appConfig); err != nil {
+	if err := config.Validate(appConfig); err != nil {
 		log.Fatal().Err(err).Msg("config could not be validated")
 	}
 	groupUpdates := make(chan *group.Group, 1)
@@ -104,12 +106,13 @@ func runApp() {
 		log.Fatal().Err(err).Msg("could not build groups")
 	}
 
-	audit, err := deps.BuildAudit(appConfig)
+	journal, err := deps.BuildAudit(appConfig)
 	if err != nil {
 		log.Fatal().Err(err).Msg("could not build journal impl")
 	}
 
-	app, err := internal.NewConditionalReboot(groups, rebootImpl, audit, groupUpdates)
+	opts := []app.ConditionalRebootOpts{app.UseJournal(journal)}
+	app, err := app.NewConditionalReboot(groups, rebootImpl, groupUpdates, opts...)
 	if err != nil {
 		log.Fatal().Err(err).Msg("could not build conditional-reboot app")
 	}
