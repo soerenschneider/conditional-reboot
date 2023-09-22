@@ -3,13 +3,13 @@ package deps
 import (
 	"fmt"
 
-	"github.com/soerenschneider/conditional-reboot/internal"
 	"github.com/soerenschneider/conditional-reboot/internal/agent"
 	"github.com/soerenschneider/conditional-reboot/internal/agent/preconditions"
 	"github.com/soerenschneider/conditional-reboot/internal/checkers"
+	"github.com/soerenschneider/conditional-reboot/internal/config"
 )
 
-func BuildAgent(c *internal.AgentConf) (*agent.StatefulAgent, error) {
+func BuildAgent(c *config.AgentConf) (*agent.StatefulAgent, error) {
 	checker, err := BuildChecker(c)
 	if err != nil {
 		return nil, fmt.Errorf("could not build checker: %w", err)
@@ -28,7 +28,7 @@ func BuildAgent(c *internal.AgentConf) (*agent.StatefulAgent, error) {
 	return agent, nil
 }
 
-func BuildChecker(c *internal.AgentConf) (checkers.Checker, error) {
+func BuildChecker(c *config.AgentConf) (checkers.Checker, error) {
 	switch c.CheckerName {
 	case checkers.NeedrestartCheckerName:
 		return checkers.NeedrestartCheckerFromMap(c.CheckerArgs)
@@ -47,7 +47,7 @@ func BuildChecker(c *internal.AgentConf) (checkers.Checker, error) {
 	return nil, fmt.Errorf("unknown checker: %s", c.CheckerName)
 }
 
-func BuildPrecondition(c *internal.AgentConf) (preconditions.Precondition, error) {
+func BuildPrecondition(c *config.AgentConf) (preconditions.Precondition, error) {
 	switch c.PreconditionName {
 	case preconditions.WindowedPreconditionName:
 		return preconditions.WindowPreconditionFromMap(c.PreconditionArgs)

@@ -140,17 +140,3 @@ func initLogging() {
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
 	}
 }
-
-func readConfig(file string) (*internal.ConditionalRebootConfig, error) {
-	data, err := os.ReadFile(file)
-	if err != nil {
-		return nil, err
-	}
-
-	var ret internal.ConditionalRebootConfig
-	if err = json.Unmarshal(data, &ret); err != nil {
-		return nil, err
-	}
-
-	return &ret, nil
-}

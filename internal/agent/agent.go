@@ -4,11 +4,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
 	"github.com/rs/zerolog/log"
 	"github.com/soerenschneider/conditional-reboot/internal"
 	"github.com/soerenschneider/conditional-reboot/internal/agent/preconditions"
 	"github.com/soerenschneider/conditional-reboot/internal/agent/state"
 	"github.com/soerenschneider/conditional-reboot/internal/checkers"
+	"github.com/soerenschneider/conditional-reboot/internal/config"
+
 	"sync"
 	"time"
 )
@@ -29,7 +32,7 @@ type StatefulAgent struct {
 	mutex           sync.RWMutex
 }
 
-func NewAgent(checker checkers.Checker, precondition preconditions.Precondition, conf *internal.AgentConf) (*StatefulAgent, error) {
+func NewAgent(checker checkers.Checker, precondition preconditions.Precondition, conf *config.AgentConf) (*StatefulAgent, error) {
 	if checker == nil {
 		return nil, errors.New("could not build agent: empty checker supplied")
 	}

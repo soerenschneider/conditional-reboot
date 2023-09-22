@@ -1,7 +1,8 @@
-package internal
+package config
 
 import (
 	"encoding/json"
+	"os"
 
 	"github.com/rs/zerolog/log"
 	"github.com/soerenschneider/conditional-reboot/internal/agent/state"
@@ -18,6 +19,20 @@ type ConditionalRebootConfig struct {
 	JournalFile       string      `json:"journal_file" validate:"omitempty,filepath"`
 	MetricsListenAddr string      `json:"metrics_listen_addr" validate:"excluded_with=MetricsDir"`
 	MetricsDir        string      `json:"metrics_dir" validate:"excluded_with=MetricsListenAddr,omitempty,dirpath"`
+}
+
+func ReadConfig(file string) (*ConditionalRebootConfig, error) {
+	data, err := os.ReadFile(file)
+	if err != nil {
+		return nil, err
+	}
+
+	var ret ConditionalRebootConfig
+	if err = json.Unmarshal(data, &ret); err != nil {
+		return nil, err
+	}
+
+	return &ret, nil
 }
 
 func (conf *ConditionalRebootConfig) Print() {

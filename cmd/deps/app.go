@@ -3,11 +3,11 @@ package deps
 import (
 	"fmt"
 
-	"github.com/soerenschneider/conditional-reboot/internal"
+	"github.com/soerenschneider/conditional-reboot/internal/config"
 	"github.com/soerenschneider/conditional-reboot/internal/group"
 )
 
-func BuildGroups(groupUpdates chan *group.Group, conf *internal.ConditionalRebootConfig) ([]*group.Group, error) {
+func BuildGroups(groupUpdates chan *group.Group, conf *config.ConditionalRebootConfig) ([]*group.Group, error) {
 	var groups []*group.Group
 
 	for _, groupConf := range conf.Groups {

@@ -3,13 +3,13 @@ package deps
 import (
 	"strings"
 
-	"github.com/soerenschneider/conditional-reboot/internal"
 	"github.com/soerenschneider/conditional-reboot/internal/agent/state"
+	"github.com/soerenschneider/conditional-reboot/internal/config"
 	"github.com/soerenschneider/conditional-reboot/internal/group"
 	"github.com/soerenschneider/conditional-reboot/internal/group/state_evaluator"
 )
 
-func BuildGroup(groupUpdates chan *group.Group, conf *internal.GroupConf) (*group.Group, error) {
+func BuildGroup(groupUpdates chan *group.Group, conf *config.GroupConf) (*group.Group, error) {
 	agents, err := BuildAgents(conf)
 	if err != nil {
 		return nil, err
@@ -28,7 +28,7 @@ func BuildGroup(groupUpdates chan *group.Group, conf *internal.GroupConf) (*grou
 	return group, nil
 }
 
-func BuildAgents(conf *internal.GroupConf) ([]state.Agent, error) {
+func BuildAgents(conf *config.GroupConf) ([]state.Agent, error) {
 	var agents []state.Agent
 	for _, agentConf := range conf.Agents {
 		agentConf := agentConf
@@ -42,7 +42,7 @@ func BuildAgents(conf *internal.GroupConf) ([]state.Agent, error) {
 	return agents, nil
 }
 
-func BuildStateEvaluator(conf *internal.GroupConf) (state_evaluator.StateEvaluator, error) {
+func BuildStateEvaluator(conf *config.GroupConf) (state_evaluator.StateEvaluator, error) {
 	switch strings.ToLower(conf.StateEvaluatorName) {
 	case state_evaluator.StateCheckerAndName:
 		return state_evaluator.NewStateCheckerAnd(conf.StateEvaluatorArgs)
