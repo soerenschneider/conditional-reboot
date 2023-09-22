@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.6.0](https://github.com/soerenschneider/conditional-reboot/compare/v1.5.1...v1.6.0) (2023-09-22)
+
+
+### Features
+
+* add safeguards to not get stuck in reboot loop ([ee4ac7d](https://github.com/soerenschneider/conditional-reboot/commit/ee4ac7dd5a918aaa320b029f830d2dd919f2a7be))
+* make needrestart checker configurable ([ae38700](https://github.com/soerenschneider/conditional-reboot/commit/ae38700b870992e9469d6fd6eb6e10b0443bf100))
+
+
+### Bug Fixes
+
+* actually honor 'safe for reboot' condition ([2858d90](https://github.com/soerenschneider/conditional-reboot/commit/2858d900d9fbe3933dd61f75234e20f9f84c044d))
+* fix linux code ([7fec818](https://github.com/soerenschneider/conditional-reboot/commit/7fec81823399ce603e9ad0bd70fe52003c04d988))
+
 ## [1.5.1](https://github.com/soerenschneider/conditional-reboot/compare/v1.5.0...v1.5.1) (2023-09-06)
 
 
