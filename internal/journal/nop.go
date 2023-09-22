@@ -1,7 +1,7 @@
 package journal
 
-type NoopAudit struct{}
+type NoopJournal struct{}
 
-func (n *NoopAudit) Journal(string) error {
+func (n *NoopJournal) Journal(string) error {
 	return nil
 }

@@ -6,19 +6,19 @@ import (
 	"strings"
 )
 
-type JournalFile struct {
+type FileJournal struct {
 	file string
 }
 
-func NewJournalFile(file string) (*JournalFile, error) {
+func NewFileJournal(file string) (*FileJournal, error) {
 	if len(file) == 0 {
 		return nil, errors.New("empty file provided")
 	}
 
-	return &JournalFile{file: file}, nil
+	return &FileJournal{file: file}, nil
 }
 
-func (a *JournalFile) Journal(action string) error {
+func (a *FileJournal) Journal(action string) error {
 	return appendToFile(a.file, action)
 }
 
