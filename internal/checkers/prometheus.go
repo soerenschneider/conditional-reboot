@@ -14,6 +14,7 @@ import (
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/common/model"
 	"github.com/rs/zerolog/log"
+	"go.uber.org/multierr"
 )
 
 const PrometheusName = "prometheus"
@@ -34,7 +35,9 @@ type PrometheusChecker struct {
 	wantResponse   bool
 }
 
-func NewPrometheusChecker(name, address string, queries map[string]string) (*PrometheusChecker, error) {
+type PrometheusOpts func(checker *PrometheusChecker) error
+
+func NewPrometheusChecker(name, address string, queries map[string]string, opts ...PrometheusOpts) (*PrometheusChecker, error) {
 	if len(name) == 0 {
 		return nil, errors.New("no 'name' supplied")
 	}
@@ -64,8 +67,16 @@ func NewPrometheusChecker(name, address string, queries map[string]string) (*Pro
 		clients[address] = client
 	}
 
+	var errs error
+	for _, opt := range opts {
+		err := opt(checker)
+		if err != nil {
+			errs = multierr.Append(errs, err)
+		}
+	}
+
 	checker.client = clients[address]
-	return checker, nil
+	return checker, errs
 }
 
 func (c *PrometheusChecker) buildClient() (v1.API, error) {
@@ -85,73 +96,6 @@ func (c *PrometheusChecker) buildClient() (v1.API, error) {
 	}
 
 	return v1.NewAPI(client), nil
-}
-
-//nolint:cyclop
-func PrometheusCheckerFromMap(args map[string]any) (*PrometheusChecker, error) {
-	if len(args) == 0 {
-		return nil, errors.New("could not build prometheus checker, empty args supplied")
-	}
-
-	name, ok := args["name"]
-	if !ok {
-		return nil, errors.New("could not build prometheus checker, empty 'name' provided")
-	}
-
-	address, ok := args["address"].(string)
-	if !ok {
-		return nil, errors.New("could not build prometheus checker, empty 'address' provided")
-	}
-
-	queries, ok := args["queries"]
-	if !ok {
-		return nil, errors.New("could not build prometheus checker, empty 'queries' provided")
-	}
-	queriesTmp, ok := queries.(map[string]any)
-	if !ok {
-		return nil, errors.New("'queries' is not of type map[string]string")
-	}
-	queriesMap := map[string]string{}
-	for k := range queriesTmp {
-		if v, ok := queriesTmp[k].(string); ok {
-			queriesMap[k] = v
-		}
-	}
-
-	checker, err := NewPrometheusChecker(fmt.Sprintf("%s", name), address, queriesMap)
-	if err != nil {
-		return nil, err
-	}
-
-	wantResponse, ok := args["wantResponse"].(bool)
-	if !ok {
-		wantResponse = true
-	}
-	checker.wantResponse = wantResponse
-
-	clientCert, ok := args["tls_client_cert"]
-	if ok {
-		checker.clientCertFile = fmt.Sprintf("%s", clientCert)
-	}
-
-	clientKey, ok := args["tls_client_key"]
-	if ok {
-		checker.clientKeyFile = fmt.Sprintf("%s", clientKey)
-	}
-
-	mutex.Lock()
-	defer mutex.Unlock()
-
-	if _, ok := clients[address]; !ok {
-		client, err := checker.buildClient()
-		if err != nil {
-			return nil, fmt.Errorf("could not build prometheus client: %w", err)
-		}
-		clients[address] = client
-	}
-
-	checker.client = clients[address]
-	return checker, nil
 }
 
 func (c *PrometheusChecker) LoadTlsClientCerts(info *tls.CertificateRequestInfo) (*tls.Certificate, error) {

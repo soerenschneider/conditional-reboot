@@ -10,6 +10,7 @@ import (
 	"sync"
 
 	"github.com/rs/zerolog/log"
+	"go.uber.org/multierr"
 )
 
 const (
@@ -45,7 +46,9 @@ type NeedrestartChecker struct {
 	needrestart  Needrestart
 }
 
-func NewNeedrestartChecker(options ...func(checker *NeedrestartChecker) error) (*NeedrestartChecker, error) {
+type NeedRestartOpts func(checker *NeedrestartChecker) error
+
+func NewNeedrestartChecker(options ...NeedRestartOpts) (*NeedrestartChecker, error) {
 	checker := &NeedrestartChecker{
 		sync:          sync.Mutex{},
 		needrestart:   &NeedrestartCmd{},
@@ -53,14 +56,15 @@ func NewNeedrestartChecker(options ...func(checker *NeedrestartChecker) error) (
 		rebootOnSvc:   DefaultRebootOnSvc,
 	}
 
+	var errs error
 	for _, opt := range options {
 		err := opt(checker)
 		if err != nil {
-			return nil, err
+			errs = multierr.Append(errs, err)
 		}
 	}
 
-	return checker, nil
+	return checker, errs
 }
 
 func (n *NeedrestartChecker) Name() string {
