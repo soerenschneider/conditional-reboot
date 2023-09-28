@@ -1,5 +1,8 @@
 # conditional-reboot
 [![Go Report Card](https://goreportcard.com/badge/github.com/soerenschneider/conditional-reboot)](https://goreportcard.com/report/github.com/soerenschneider/conditional-reboot)
+![test-workflow](https://github.com/soerenschneider/conditional-reboot/actions/workflows/test.yaml/badge.svg)
+![release-workflow](https://github.com/soerenschneider/conditional-reboot/actions/workflows/release.yaml/badge.svg)
+![golangci-lint-workflow](https://github.com/soerenschneider/conditional-reboot/actions/workflows/golangci-lint.yaml/badge.svg)
 
 conditional-reboot orchestrates the execution of reboots across server fleets to ensure security and stability of your infrastructure.
 Primarily it is aimed at executing pending security updates but also to recover from sudden network loss due to faulty drivers and / or hardware for machines thousands of kilometres away.
