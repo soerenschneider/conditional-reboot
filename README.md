@@ -6,18 +6,12 @@ Primarily it is aimed at executing pending security updates but also to recover 
 
 ## Features
 
-🚨 Automatic reboot on pending security updates
-
-🐞 Automatic reboot on buggy drivers / network adapters after network loss
-
-⏲  Allows setting time-based schedules when it's safe to reboot
-
-🚦 Allows defining fine-grained conditions to combine multiple input sources
-
-📫 Keeps an audit log of reboots
-
-☔️ Safety net that prevents reboot loops
-
+🚨 Automatic reboot on pending security updates<br/>
+🐞 Automatic reboot on buggy drivers / network adapters after network loss<br/>
+⏲  Allows setting time-based schedules when it's safe to reboot<br/>
+🚦 Allows defining fine-grained conditions to combine multiple input sources<br/>
+📫 Keeps an audit log of reboots<br/>
+☔️ Safety net that prevents reboot loops<br/>
 
 ## Installation
 
