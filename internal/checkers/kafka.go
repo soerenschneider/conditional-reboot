@@ -2,12 +2,18 @@ package checkers
 
 import (
 	"context"
-	"fmt"
 	"os"
+	"sync"
+	"time"
 
 	"github.com/rs/zerolog/log"
 	"github.com/segmentio/kafka-go"
 	"go.uber.org/multierr"
+)
+
+const (
+	KafkaCheckerName = "kafka"
+	defaultGraceTime = 5 * time.Minute
 )
 
 type KafkaChecker struct {
@@ -16,7 +22,11 @@ type KafkaChecker struct {
 	partition int
 	groupId   string
 
-	acceptedKeys []string
+	mutex       sync.RWMutex
+	graceTime   time.Duration
+	messageDate time.Time
+
+	acceptedKeys map[string]bool
 
 	reader *kafka.Reader
 
@@ -31,6 +41,7 @@ func NewKafkaChecker(brokers []string, topic string, opts ...KafkaOpts) (*KafkaC
 		brokers:      brokers,
 		topic:        topic,
 		acceptedKeys: getDefaultAcceptedKeys(),
+		graceTime:    defaultGraceTime,
 	}
 
 	var errs error
@@ -39,21 +50,32 @@ func NewKafkaChecker(brokers []string, topic string, opts ...KafkaOpts) (*KafkaC
 			errs = multierr.Append(errs, err)
 		}
 	}
+
 	return c, errs
 }
 
-func getDefaultAcceptedKeys() (acceptedKeys []string) {
+func (c *KafkaChecker) Name() string {
+	return KafkaCheckerName
+}
+
+func KafkaCheckerFromMap(args map[string]any) (*KafkaChecker, error) {
+	// TODO: implement
+	panic("not implemented")
+}
+
+func getDefaultAcceptedKeys() map[string]bool {
 	systemHostname, err := os.Hostname()
 	if err != nil {
 		log.Warn().Err(err).Msg("could not auto-detect system hostname for kafka's accepted keys")
-		return
+		return nil
 	}
 
-	acceptedKeys = append(acceptedKeys, systemHostname)
-	return
+	return map[string]bool{
+		systemHostname: true,
+	}
 }
 
-func (c *KafkaChecker) Start() error {
+func (c *KafkaChecker) Start(stop chan bool) error {
 	c.reader = kafka.NewReader(kafka.ReaderConfig{
 		Brokers:   c.brokers,
 		Topic:     c.topic,
@@ -62,21 +84,43 @@ func (c *KafkaChecker) Start() error {
 		GroupID:   c.groupId,
 	})
 
+	cont := true
+	go func() {
+		<-stop
+		cont = false
+		if err := c.reader.Close(); err != nil {
+			log.Error().Err(err).Msg("error while closing kafka reader")
+		}
+	}()
+
+	go func() {
+		for cont {
+			c.consume()
+		}
+	}()
+
 	return nil
 }
 
+func (c *KafkaChecker) consume() {
+	msg, err := c.reader.ReadMessage(context.Background())
+	if err != nil {
+		log.Error().Err(err).Msg("error while reading message from kafka")
+		return
+	}
+
+	_, ok := c.acceptedKeys[string(msg.Key)]
+	if ok {
+		c.mutex.Lock()
+		c.messageDate = time.Now()
+		c.mutex.Unlock()
+	}
+}
+
 func (c *KafkaChecker) IsHealthy(ctx context.Context) (bool, error) {
-	for {
-		m, err := c.reader.ReadMessage(context.Background())
-		if err != nil {
-			break
-		}
-		fmt.Printf("message at offset %d: %s = %s\n", m.Offset, string(m.Key), string(m.Value))
-	}
+	c.mutex.RLock()
+	defer c.mutex.RUnlock()
 
-	if err := c.reader.Close(); err != nil {
-		return false, err
-	}
-
-	return false, nil
+	// if the timestamp of the message is recent enough we signal we want a reboot
+	return time.Since(c.messageDate) <= c.graceTime, nil
 }

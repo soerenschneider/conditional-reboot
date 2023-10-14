@@ -42,6 +42,8 @@ func BuildChecker(c *config.AgentConf) (checkers.Checker, error) {
 		return checkers.TcpCheckerFromMap(c.CheckerArgs)
 	case checkers.IcmpCheckerName:
 		return checkers.IcmpCheckerFromMap(c.CheckerArgs)
+	case checkers.KafkaCheckerName:
+		return checkers.KafkaCheckerFromMap(c.CheckerArgs)
 	}
 
 	return nil, fmt.Errorf("unknown checker: %s", c.CheckerName)
