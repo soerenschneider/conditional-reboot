@@ -1,0 +1,20 @@
+groups:
+  - name: lost connectivity
+    state_evaluator_name: and
+    state_evaluator_args:
+      reboot: 15m
+    agents:
+      - checker_name: tcp
+        checker_args:
+          host: 8.8.8.8
+          port: "53"
+        check_interval: 1m
+        healthy_streak_until_ok: 1
+        unhealthy_streak_until_reboot: 3
+      - checker_name: tcp
+        checker_args:
+          host: 1.1.1.1
+          port: "53"
+        check_interval: 1m
+        healthy_streak_until_ok: 1
+        unhealthy_streak_until_reboot: 3
