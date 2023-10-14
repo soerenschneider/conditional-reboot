@@ -35,8 +35,7 @@ func NewKafkaChecker(brokers []string, topic string, opts ...KafkaOpts) (*KafkaC
 
 	var errs error
 	for _, opt := range opts {
-		err := opt(c);
-		if err != nil {
+		if err := opt(c); err != nil {
 			errs = multierr.Append(errs, err)
 		}
 	}
@@ -60,6 +59,7 @@ func (c *KafkaChecker) Start() error {
 		Topic:     c.topic,
 		Partition: c.partition,
 		MaxBytes:  10e6,
+		GroupID:   c.groupId,
 	})
 
 	return nil
