@@ -3,7 +3,7 @@ module github.com/soerenschneider/conditional-reboot
 go 1.20
 
 require (
-	github.com/go-playground/validator/v10 v10.15.5
+	github.com/go-playground/validator/v10 v10.16.0
 	github.com/hashicorp/go-retryablehttp v0.7.4
 	github.com/prometheus-community/pro-bing v0.3.0
 	github.com/prometheus/client_golang v1.17.0
