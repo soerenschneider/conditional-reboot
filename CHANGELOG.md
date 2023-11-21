@@ -1,5 +1,25 @@
 # Changelog
 
+## [1.7.0](https://github.com/soerenschneider/conditional-reboot/compare/v1.6.0...v1.7.0) (2023-11-21)
+
+
+### Features
+
+* add support for yaml ([1250faf](https://github.com/soerenschneider/conditional-reboot/commit/1250fafa5ba487c5d0d7df2f64420f377c45bbc6))
+
+
+### Bug Fixes
+
+* **deps:** bump github.com/go-playground/validator/v10 ([0a27f81](https://github.com/soerenschneider/conditional-reboot/commit/0a27f816d33c9a71c12da90321dfb1127720b5f4))
+* **deps:** bump github.com/go-playground/validator/v10 ([a432f28](https://github.com/soerenschneider/conditional-reboot/commit/a432f283d6d824cec25322ba4702c6e91e89a506))
+* **deps:** bump github.com/hashicorp/go-retryablehttp ([a6db6ff](https://github.com/soerenschneider/conditional-reboot/commit/a6db6fffd4e3daeeb3507a317cbce74e050c73a0))
+* **deps:** bump github.com/prometheus/client_golang ([037387e](https://github.com/soerenschneider/conditional-reboot/commit/037387e1b472253f9aef1a23dcd2d8a5552250f2))
+* **deps:** bump github.com/prometheus/common from 0.44.0 to 0.45.0 ([7a16731](https://github.com/soerenschneider/conditional-reboot/commit/7a16731b86635798bf1a8f1a771f5227443f769c))
+* **deps:** Bump github.com/rs/zerolog from 1.30.0 to 1.31.0 ([099ad43](https://github.com/soerenschneider/conditional-reboot/commit/099ad43aad638af189fb65c157c2020e9db5bf87))
+* **deps:** bump github.com/segmentio/kafka-go from 0.4.42 to 0.4.44 ([bfef265](https://github.com/soerenschneider/conditional-reboot/commit/bfef26519a1f635521b8c888f1ef722ddb60a276))
+* **deps:** bump github.com/segmentio/kafka-go from 0.4.44 to 0.4.45 ([9979f7c](https://github.com/soerenschneider/conditional-reboot/commit/9979f7c9d4db745bd1d6c80c07961b914e01ac69))
+* **deps:** bump golang.org/x/net from 0.11.0 to 0.17.0 ([a76ceeb](https://github.com/soerenschneider/conditional-reboot/commit/a76ceeb575b7f3d82db36fb91cf27f85f6d72379))
+
 ## [1.6.0](https://github.com/soerenschneider/conditional-reboot/compare/v1.5.1...v1.6.0) (2023-09-22)
 
 
